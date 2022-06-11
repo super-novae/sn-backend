@@ -33,6 +33,10 @@ https://dbdiagram.io/d/629c499b54ce2635275fd31d
    ```txt
     FLASK_ENV=development
     FLASK_APP=run.py
+    SWAGGER_UI_CSS=https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.11.1/swagger-ui.min.css
+    SWAGGER_UI_BUNDLE_JS=https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.11.1/swagger-ui-bundle.min.js
+    SWAGGER_UI_STANDALONE_PRESET_JS=https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.11.1/swagger-ui-standalone-preset.min.js
+    REDOC_STANDALONE_JS=https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js
     ```
 
 7. Run application
