@@ -54,7 +54,16 @@ https://dbdiagram.io/d/629c499b54ce2635275fd31d
    flask db migrate
    flask db upgrade
    ```
-9. Run application
+9. Create a super user by opening `flask shell` and running the following commands
+    ```bash
+   from api.administrator.models import SuperUser
+   from api.extensions import db
+   su = SuperUser(name="Super User", username="super_u", email="superu@email.com")
+   su.password = "helloworld__"
+   db.session.add(su)
+   db.session.commit()
+   ```
+10. Run application
     ```bash
     flask run
     ```
