@@ -1,5 +1,5 @@
 from apiflask import Schema
-from apiflask.fields import String, Email, Integer, DateTime, List, Nested
+from apiflask.fields import String, Email, DateTime, List, Nested
 
 
 class AdministratorSchema(Schema):
@@ -16,5 +16,5 @@ class AdministratorsSchema(Schema):
 
 
 class AdministratorLoginSchema(Schema):
-    username = String(required=True, load_only=True)
+    email = Email(required=True, load_only=True)
     password = String(required=True, load_only=True)

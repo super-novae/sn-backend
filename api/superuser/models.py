@@ -8,8 +8,8 @@ import secrets
 load_dotenv()
 
 
-class Administrator(db.Model):
-    __tablename__ = "sn_administrator"
+class Superuser(db.Model):
+    __tablename__ = "sn_superuser"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     public_id = db.Column(db.String(length=130), nullable=False, unique=True)
@@ -36,7 +36,7 @@ class Administrator(db.Model):
             password, environ.get("BCRYPT_LOG_ROUNDS")
         ).decode(encoding="utf-8", errors="ignore")
 
-    def verify_admin(self, password):
+    def verify_superuser(self, password):
         return bcrypt.check_password_hash(self.password_hash, password)
 
     @classmethod
@@ -46,11 +46,3 @@ class Administrator(db.Model):
     @classmethod
     def find_by_username(cls, username):
         return cls.query.filter_by(username=username).first()
-
-    @classmethod
-    def find_by_email(cls, email):
-        return cls.query.filter_by(email=email).first()
-
-    @classmethod
-    def get_all(cls):
-        return cls.query.all()
