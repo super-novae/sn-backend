@@ -1,14 +1,18 @@
 from apiflask import APIBlueprint
+from flask_jwt_extended import jwt_required, create_access_token, get_jwt_identity
+from api.extensions import db
+from .errors import *
 from .models import Administrator
-from .schema import AdministratorSchema, AdministratorsSchema, AdministratorLoginSchema
-from .errors import AdministratorNotFound
+from .schema import *
+from api.generic.methods import has_roles
+from api.generic.errors import *
 
 # Initiate module blueprint
 administrator = APIBlueprint(
     "administrator",
     __name__,
     tag="Administrator",
-    url_prefix="/api/v1/elections/<election_id>/administrators",
+    url_prefix="/api/v1/administrators",
 )
 
 
@@ -19,8 +23,25 @@ administrator = APIBlueprint(
     summary="Administrator Sign Up",
     description="An endpoint for the creation of administrators",
 )
-def administrator_sign_up(election_id, data):
-    pass
+def administrator_sign_up(data):        
+    # Checking if admin with the same email exists
+    admin_email_exists = Administrator.find_by_email(data.email)
+    if admin_email_exists:
+        raise AdministratorWithEmailExists
+
+    # Check if admin with the same username exists
+    admin_username_exists = Administrator.find_by_username(data.username)
+    if admin_username_exists:
+        raise AdministratorWithUsernameExists
+
+    # Create admin instance
+    admin = Administrator(**data)
+
+    # Commit to database
+    db.session.add(admin)
+    db.session.commit()
+
+    return admin
 
 
 @administrator.post("/login")
@@ -30,8 +51,15 @@ def administrator_sign_up(election_id, data):
     summary="Administrator Login",
     description="An endpoint for the login of administrators",
 )
-def administrator_login(election_id, data):
-    pass
+def administrator_login(data):
+    admin = Administrator.find_by_email(data["email"])
+
+    if admin:
+        admin_password_is_correct = admin.verify_password(data["password"])
+        if admin_password_is_correct:
+            admin.auth_token = create_access_token(admin.public_id)
+            return admin
+    return AdministratorWithCredentialsDoesNotExist
 
 
 @administrator.get("/")
@@ -40,8 +68,16 @@ def administrator_login(election_id, data):
     summary="Administrator Get All",
     description="An endpoint to get all administrators",
 )
-def administrator_get_all(election_id):
-    pass
+@jwt_required()
+def administrator_get_all():
+    # Perform security checks
+    user_has_required_roles = has_roles(['super'], get_jwt_identity())
+    if not user_has_required_roles:
+        raise UserDoesNotHaveRequiredRoles    
+    
+    admins = Administrator.get_all()
+
+    return admins
 
 
 @administrator.get("/<admin_id>")
@@ -50,5 +86,13 @@ def administrator_get_all(election_id):
     summary="Administrator Get By Id",
     description="An endpoint to an administrator by ID",
 )
-def administrator_get_by_id(election_id, id):
-    raise AdministratorNotFound
+@jwt_required()
+def administrator_get_by_id(admin_id):
+    # Perform security checks
+    user_has_required_roles = has_roles(['super', 'admin'], get_jwt_identity())
+    if not user_has_required_roles:
+        raise UserDoesNotHaveRequiredRoles
+    
+    admin = Administrator.find_by_id(admin_id)
+
+    return admin

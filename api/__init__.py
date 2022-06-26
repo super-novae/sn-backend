@@ -4,6 +4,7 @@ from .config import config_dict
 from dotenv import load_dotenv
 from os import getenv
 from .administrator.controllers import administrator
+from .superuser.controllers import superuser
 
 # Load environment variables
 load_dotenv()
@@ -19,9 +20,11 @@ def create_app():
     cors.init_app(app=app)
     db.init_app(app=app)
     bcrypt.init_app(app=app)
-    migrate.init_app(app=app, db=db)
+    jwt.init_app(app=app)
+    migrate.init_app(app=app, db=db, compare_type=True)
 
     # Register blueprints for the application
     app.register_blueprint(administrator)
+    app.register_blueprint(superuser)
 
     return app
