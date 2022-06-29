@@ -23,4 +23,4 @@ class AdministratorTokenExpired(HTTPError):
 
 class AdministratorTokenInvalid(HTTPError):
     status_code: int = 401
-    message: str = "Administrator token is invalid. Please login again"
+    message: str = "Administrator token is invalid. Please login again."
