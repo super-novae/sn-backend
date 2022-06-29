@@ -22,20 +22,22 @@ administrator = APIBlueprint(
 @administrator.doc(
     summary="Administrator Sign Up",
     description="An endpoint for the creation of administrators",
+    responses=[200, 409],
 )
-def administrator_sign_up(data):        
+def administrator_sign_up(data):
     # Checking if admin with the same email exists
-    admin_email_exists = Administrator.find_by_email(data.email)
+    admin_email_exists = Administrator.find_by_email(data["email"])
     if admin_email_exists:
         raise AdministratorWithEmailExists
 
     # Check if admin with the same username exists
-    admin_username_exists = Administrator.find_by_username(data.username)
+    admin_username_exists = Administrator.find_by_username(data["username"])
     if admin_username_exists:
         raise AdministratorWithUsernameExists
 
     # Create admin instance
     admin = Administrator(**data)
+    admin.password = data["password"]
 
     # Commit to database
     db.session.add(admin)
@@ -45,8 +47,8 @@ def administrator_sign_up(data):
 
 
 @administrator.post("/login")
-@administrator.input(AdministratorLoginSchema)
-@administrator.output(AdministratorSchema)
+@administrator.input(AdministratorLoginInputSchema)
+@administrator.output(AdministratorLoginOutputSchema)
 @administrator.doc(
     summary="Administrator Login",
     description="An endpoint for the login of administrators",
@@ -59,7 +61,7 @@ def administrator_login(data):
         if admin_password_is_correct:
             admin.auth_token = create_access_token(admin.public_id)
             return admin
-    return AdministratorWithCredentialsDoesNotExist
+    raise AdministratorWithCredentialsDoesNotExist
 
 
 @administrator.get("/")
@@ -71,13 +73,13 @@ def administrator_login(data):
 @jwt_required()
 def administrator_get_all():
     # Perform security checks
-    user_has_required_roles = has_roles(['super'], get_jwt_identity())
+    user_has_required_roles = has_roles(["super"], get_jwt_identity())
     if not user_has_required_roles:
-        raise UserDoesNotHaveRequiredRoles    
-    
+        raise UserDoesNotHaveRequiredRoles
+
     admins = Administrator.get_all()
 
-    return admins
+    return {"administrators": admins}
 
 
 @administrator.get("/<admin_id>")
@@ -89,10 +91,12 @@ def administrator_get_all():
 @jwt_required()
 def administrator_get_by_id(admin_id):
     # Perform security checks
-    user_has_required_roles = has_roles(['super', 'admin'], get_jwt_identity())
+    user_has_required_roles = has_roles(["super", "admin"], get_jwt_identity())
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
-    
-    admin = Administrator.find_by_id(admin_id)
 
-    return admin
+    admin = Administrator.find_by_public_id(admin_id)
+    if admin:
+        return admin
+
+    raise AdministratorWithCredentialsDoesNotExist

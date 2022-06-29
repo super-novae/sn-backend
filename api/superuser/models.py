@@ -19,7 +19,7 @@ class Superuser(db.Model):
     date_created = db.Column(db.DateTime(), nullable=False)
     password_hash = db.Column(db.String(length=130), nullable=False)
 
-    def __init__(self, name, username, email):
+    def __init__(self, name, username, email, password):
         self.public_id = secrets.token_hex(64)
         self.name = name
         self.username = username

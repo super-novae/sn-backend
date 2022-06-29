@@ -6,7 +6,7 @@ from .schema import *
 
 # Initiate Super User module blueprint
 superuser = APIBlueprint(
-    "superuser", __name__, tag="Superuser", url_prefix="/api/v1/superusers"
+    "superuser", __name__, tag="Superuser", url_prefix="/api/v1/superuser"
 )
 
 
