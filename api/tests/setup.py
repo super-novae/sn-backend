@@ -1,4 +1,4 @@
-from api import db, fake
+from api import db
 
 
 def truncate_db_tables():

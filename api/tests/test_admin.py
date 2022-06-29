@@ -1,6 +1,5 @@
 from .setup import truncate_db_tables
 from api.administrator.models import Administrator
-from api.extensions import fake
 from api.test_data.admin_data import *
 from api.test_data.superuser_data import *
 
