@@ -24,7 +24,13 @@ administrator = APIBlueprint(
     description="An endpoint for the creation of administrators",
     responses=[200, 409],
 )
+@jwt_required()
 def administrator_sign_up(data):
+    # Perform security checks
+    user_has_required_roles = has_roles(["super"], get_jwt_identity())
+    if not user_has_required_roles:
+        raise UserDoesNotHaveRequiredRoles
+    
     # Checking if admin with the same email exists
     admin_email_exists = Administrator.find_by_email(data["email"])
     if admin_email_exists:
