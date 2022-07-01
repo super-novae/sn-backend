@@ -3,6 +3,9 @@ name: Black & Pylint
 on: 
   push:
     branches: [ "main" ]
+  pull_request:
+    types:
+      - "opened"
 
 jobs:
   build:
