@@ -11,7 +11,8 @@ organization = APIBlueprint(
     "organization", __name__, tag="Organization", url_prefix="/api/v1/organization"
 )
 
-@organization.post('/')
+
+@organization.post("/")
 @organization.input(OrganizationSchema)
 @organization.output(OrganizationSchema)
 @jwt_required()
@@ -20,52 +21,54 @@ def organization_create(data):
     user_has_required_roles = has_roles(["admin"], get_jwt_identity())
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
-    
+
     new_organizatioon = Organization(**data)
-    
+
     db.session.add(new_organizatioon)
     db.session.commit()
-    
+
     return new_organizatioon
 
-    
 
-@organization.put('/<id>')
+@organization.put("/<id>")
 @organization.input(OrganizationSchema)
 @organization.output(OrganizationSchema)
 @jwt_required()
 def organization_modify_by_id(id, data):
     # Perform security checks
-    user_has_required_roles = has_roles(['admin'], get_jwt_identity())
+    user_has_required_roles = has_roles(["admin"], get_jwt_identity())
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
 
     organization = Organization.find_by_public_id(id)
-    
+
     if organization:
         for attribute, value in data.items():
             setattr(organization, attribute, value)
-        
-        db.session.commit()
-        
-        return organization
-    
-    raise OrganizationNotFound
-    
 
-@organization.delete('/<id>')
+        db.session.commit()
+
+        return organization
+
+    raise OrganizationNotFound
+
+
+@organization.delete("/<id>")
 @jwt_required()
 def organization_delete_by_id(id):
     # Perform security checks
-    user_has_required_roles = has_roles(['admin'], get_jwt_identity())
+    user_has_required_roles = has_roles(["admin"], get_jwt_identity())
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
 
     organization = Organization.find_by_public_id(id)
-    
+
     if organization:
         db.session.delete(organization)
         db.session.commit()
-        
-        return {"message": f"Organization <{organization.public_id}> deleted successfully.", "status_code": 200}
+
+        return {
+            "message": f"Organization <{organization.public_id}> deleted successfully.",
+            "status_code": 200,
+        }
     raise OrganizationNotFound

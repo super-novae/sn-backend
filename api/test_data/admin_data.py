@@ -1,5 +1,5 @@
 from api.extensions import fake
-from .superuser_data import superuser_create, superuser_login, superuser_signup_correct_credentials
+from .superuser_data import superuser_login
 
 data = {
     "email": fake.email(),
@@ -13,7 +13,9 @@ def administrator_signup(client):
     logged_in_superuser = superuser_login(client)
 
     response = client.post(
-        "/api/v1/administrators/signup", json=administrator_signup_correct_credentials(), headers={"Authorization": f"Bearer {logged_in_superuser['auth_token']}"}
+        "/api/v1/administrators/signup",
+        json=administrator_signup_correct_credentials(),
+        headers={"Authorization": f"Bearer {logged_in_superuser['auth_token']}"},
     )
 
     return {"admin": response.json, "superuser": logged_in_superuser}
