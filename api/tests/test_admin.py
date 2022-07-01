@@ -119,8 +119,8 @@ def test_administrator_get_all_successful(client):
 
     # Initialize data and model instances
     admin_and_superuser = administrator_signup(client)
-    created_administrator = admin_and_superuser['admin'] 
-    logged_in_superuser = admin_and_superuser['superuser']
+    created_administrator = admin_and_superuser["admin"]
+    logged_in_superuser = admin_and_superuser["superuser"]
 
     # Create a request and store the response
     response = client.get(
@@ -188,8 +188,8 @@ def test_administrator_get_by_id_successful_superuser(client):
 
     # Initialize data and model instances
     admin_and_superuser = administrator_signup(client)
-    created_administrator = admin_and_superuser['admin'] 
-    logged_in_superuser = admin_and_superuser['superuser']
+    created_administrator = admin_and_superuser["admin"]
+    logged_in_superuser = admin_and_superuser["superuser"]
 
     # Create a request and store the response
     response = client.get(
@@ -210,9 +210,8 @@ def test_administrator_get_by_id_non_existent(client):
 
     # Initialize data and model instances
     admin_and_superuser = administrator_signup(client)
-    created_administrator = admin_and_superuser['admin'] 
-    logged_in_superuser = admin_and_superuser['superuser']
-
+    created_administrator = admin_and_superuser["admin"]
+    logged_in_superuser = admin_and_superuser["superuser"]
 
     # Create a request and store the response
     response = client.get(
