@@ -28,6 +28,10 @@ def superuser_login(client):
     return response.json
 
 
+def superuser_signup_correct_credentials():
+    return data
+
+
 def superuser_login_correct_credentials():
     return {"username": data["username"], "password": data["password"]}
 

@@ -6,9 +6,9 @@ from .errors import *
 
 
 def has_roles(role_list, public_id):
-    # Possible optimization
+    # TODO: Possible optimization
     roles = {"super": Superuser, "admin": Administrator}
-    # TODO: roles = {"super": Superuser, "admin": Administrator, "voter": Voter}
+    # roles = {"super": Superuser, "admin": Administrator, "voter": Voter}
 
     current_user_roles = []
     for role in role_list:
