@@ -3,9 +3,12 @@ from secrets import token_hex
 
 
 class Organization(db.Model):
+    __tablename__ = "sn_organization"
+
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     public_id = db.Column(db.String(length=32), nullable=False, unique=True)
     name = db.Column(db.String(length=256), nullable=False)
+    elections = db.relationship("Election")
 
     def __init__(self, name):
         self.public_id = f"org-{token_hex()[:28]}"
