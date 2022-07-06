@@ -4,7 +4,7 @@ from secrets import token_hex
 
 class Election(db.Model):
     __tablename__ = "sn_election"
-    
+
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(length=120), nullable=False, unique=True)
     public_id = db.Column(db.String(length=32), nullable=False, unique=True)
@@ -30,7 +30,7 @@ class Election(db.Model):
 
 class Candidate(db.Model):
     __tablename__ = "sn_candidate"
-    
+
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(length=80), nullable=False, unique=True)
     public_id = db.Column(db.String(length=16), nullable=False, unique=True)
