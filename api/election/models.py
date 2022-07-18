@@ -7,12 +7,12 @@ class Election(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(length=120), nullable=False, unique=True)
-    public_id = db.Column(db.String(length=32), nullable=False, unique=True)
-    organization_id = db.Column(db.Integer, db.ForeignKey("sn_organization.id"))
+    public_id = db.Column(db.String(length=37), nullable=False, unique=True)
+    organization_id = db.Column(db.String(length=32), db.ForeignKey("sn_organization.public_id"))
 
-    def __init__(self, name, public_id, organization_id):
+    def __init__(self, name, organization_id):
         self.name = name
-        self.public_id = token_hex()[:32]
+        self.public_id = f"elec-{token_hex()[:32]}"
         self.organization_id = organization_id
 
     @classmethod
