@@ -4,11 +4,13 @@ from api.test_data.admin_data import *
 from api.test_data.superuser_data import *
 
 
+
 def test_administrator_signup_successful(client):
     # Remove all data from database
     truncate_db_tables()
 
     # Create a logged in superuser instance
+    superuser_create()
     logged_in_superuser = superuser_login(client)
 
     # Create a request and store the response
@@ -39,7 +41,9 @@ def test_administrator_signup_username_exists(client):
     truncate_db_tables()
 
     # Initialize data and model instances
-    logged_in_superuser = administrator_signup(client)["superuser"]
+    superuser_create()
+    administrator_signup(client)
+    logged_in_superuser = superuser_login(client)
 
     # Create a request and store the response
     response = client.post(
@@ -60,7 +64,9 @@ def test_administrator_signup_email_exists(client):
     truncate_db_tables()
 
     # Initialize data and model instances
-    logged_in_superuser = administrator_signup(client)["superuser"]
+    superuser_create()
+    administrator_signup(client)
+    logged_in_superuser = superuser_login(client)
 
     # Create a request and store the response
     response = client.post(
@@ -79,7 +85,8 @@ def test_administrator_login_successful(client):
     truncate_db_tables()
 
     # Initialize data and model instances
-    created_administrator = administrator_signup(client)["admin"]
+    superuser_create()
+    created_administrator = administrator_signup(client)
 
     # Create a request and store the response
     response = client.post(
@@ -99,6 +106,7 @@ def test_administrator_login_wrong_credentials(client):
     truncate_db_tables()
 
     # Initialize data and model instances
+    superuser_create()
     administrator_signup(client)
 
     # Create a request and store the response
@@ -118,9 +126,9 @@ def test_administrator_get_all_successful(client):
     truncate_db_tables()
 
     # Initialize data and model instances
-    admin_and_superuser = administrator_signup(client)
-    created_administrator = admin_and_superuser["admin"]
-    logged_in_superuser = admin_and_superuser["superuser"]
+    superuser_create()
+    created_administrator = administrator_signup(client)
+    logged_in_superuser = superuser_login(client)
 
     # Create a request and store the response
     response = client.get(
@@ -147,6 +155,8 @@ def test_administrator_get_all_not_authorized(client):
     truncate_db_tables()
 
     # Initialize data and model instances
+    superuser_create()
+    administrator_signup(client)
     logged_in_administrator = administrator_login(client)
 
     # Create a request and store the response
@@ -167,6 +177,8 @@ def test_administrator_get_by_id_successful_admin(client):
     truncate_db_tables()
 
     # Initialize data and model instances
+    superuser_create()
+    administrator_signup(client)
     logged_in_administrator = administrator_login(client)
 
     # Create a request and store the response
@@ -187,9 +199,9 @@ def test_administrator_get_by_id_successful_superuser(client):
     truncate_db_tables()
 
     # Initialize data and model instances
-    admin_and_superuser = administrator_signup(client)
-    created_administrator = admin_and_superuser["admin"]
-    logged_in_superuser = admin_and_superuser["superuser"]
+    superuser_create()
+    created_administrator = administrator_signup(client)
+    logged_in_superuser = superuser_login(client)
 
     # Create a request and store the response
     response = client.get(
@@ -209,9 +221,10 @@ def test_administrator_get_by_id_non_existent(client):
     truncate_db_tables()
 
     # Initialize data and model instances
-    admin_and_superuser = administrator_signup(client)
-    created_administrator = admin_and_superuser["admin"]
-    logged_in_superuser = admin_and_superuser["superuser"]
+    superuser_create()
+    created_administrator = administrator_signup(client)
+    logged_in_superuser = superuser_login(client)
+
 
     # Create a request and store the response
     response = client.get(

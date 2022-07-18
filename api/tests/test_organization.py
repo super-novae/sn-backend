@@ -6,6 +6,7 @@ from ..test_data.organization_data import (
     organization_modified_details,
     organization_create,
 )
+from ..test_data.superuser_data import superuser_create, superuser_login
 
 
 def test_organization_create_successful(client):
@@ -13,12 +14,14 @@ def test_organization_create_successful(client):
     truncate_db_tables()
 
     # Initialize data and model instances
-    logged_in_administrator = administrator_login(client)
+    superuser_create()
+    administrator_signup(client)
+    logged_in_superuser = superuser_login(client)
 
     response = client.post(
         "/api/v1/organization/",
         json=organization_details(),
-        headers={"Authorization": f"Bearer {logged_in_administrator['auth_token']}"},
+        headers={"Authorization": f"Bearer {logged_in_superuser['auth_token']}"},
     )
 
     assert response.status_code == 200
@@ -30,12 +33,15 @@ def test_organization_create_not_authorized(client):
     truncate_db_tables()
 
     # Initialize data and model instances
-    logged_in_superuser = administrator_signup(client)["superuser"]
+    superuser_create()
+    administrator_signup(client)
+    logged_in_administrator = administrator_login(client)
+
 
     response = client.post(
         "/api/v1/organization/",
         json=organization_details(),
-        headers={"Authorization": f"Bearer {logged_in_superuser['auth_token']}"},
+        headers={"Authorization": f"Bearer {logged_in_administrator['auth_token']}"},
     )
 
     assert response.status_code == 403
@@ -50,14 +56,16 @@ def test_organization_modify_by_id_successful(client):
     truncate_db_tables()
 
     # Initialize data and model instances
+    superuser_create()
+    administrator_signup(client)
     created_organization = organization_create()
     created_organization_name = created_organization.name
-    logged_in_administrator = administrator_login(client)
-
+    logged_in_superuser = superuser_login(client)
+    
     response = client.put(
         f"/api/v1/organization/{created_organization.public_id}",
         json=organization_modified_details(),
-        headers={"Authorization": f"Bearer {logged_in_administrator['auth_token']}"},
+        headers={"Authorization": f"Bearer {logged_in_superuser['auth_token']}"},
     )
 
     modified_organization = Organization.find_by_public_id(
@@ -74,13 +82,15 @@ def test_organization_modify_by_id_non_existent(client):
     truncate_db_tables()
 
     # Initialize data and model instances
+    superuser_create()
+    administrator_signup(client)
     organization_create()
-    logged_in_administrator = administrator_login(client)
+    logged_in_superuser = superuser_login(client)
 
     response = client.put(
         f"/api/v1/organization/org-some-random-public-key-onlin",
         json=organization_modified_details(),
-        headers={"Authorization": f"Bearer {logged_in_administrator['auth_token']}"},
+        headers={"Authorization": f"Bearer {logged_in_superuser['auth_token']}"},
     )
 
     assert response.status_code == 404
@@ -92,13 +102,15 @@ def test_organization_modify_by_id_not_authorized(client):
     truncate_db_tables()
 
     # Initialize data and model instances
-    logged_in_superuser = administrator_signup(client)["superuser"]
+    superuser_create()
+    administrator_signup(client)
+    logged_in_administrator = administrator_login(client)
     created_organization = organization_create()
 
     response = client.put(
         f"/api/v1/organization/{created_organization.public_id}",
         json=organization_modified_details(),
-        headers={"Authorization": f"Bearer {logged_in_superuser['auth_token']}"},
+        headers={"Authorization": f"Bearer {logged_in_administrator['auth_token']}"},
     )
 
     assert response.status_code == 403
@@ -113,14 +125,16 @@ def test_organization_delete_by_id_successful(client):
     truncate_db_tables()
 
     # Initialize data and model instances
+    superuser_create()
+    administrator_signup(client)
     created_organization = organization_create()
     created_organization_public_id = created_organization.public_id
-    logged_in_administrator = administrator_login(client)
+    logged_in_superuser = superuser_login(client)
 
     response = client.delete(
         f"/api/v1/organization/{created_organization_public_id}",
         json=organization_modified_details(),
-        headers={"Authorization": f"Bearer {logged_in_administrator['auth_token']}"},
+        headers={"Authorization": f"Bearer {logged_in_superuser['auth_token']}"},
     )
 
     deleted_organization = Organization.find_by_public_id(
@@ -140,13 +154,15 @@ def test_organization_delete_by_id_non_existent(client):
     truncate_db_tables()
 
     # Initialize data and model instances
+    superuser_create()
+    administrator_signup(client)
     organization_create()
-    logged_in_administrator = administrator_login(client)
+    logged_in_superuser = superuser_login(client)
 
     response = client.delete(
         f"/api/v1/organization/org-some-random-public-key-onlin",
         json=organization_modified_details(),
-        headers={"Authorization": f"Bearer {logged_in_administrator['auth_token']}"},
+        headers={"Authorization": f"Bearer {logged_in_superuser['auth_token']}"},
     )
 
     assert response.status_code == 404
@@ -158,14 +174,16 @@ def test_organization_delete_by_id_not_authorized(client):
     truncate_db_tables()
 
     # Initialize data and model instances
-    logged_in_superuser = administrator_signup(client)["superuser"]
+    superuser_create()
+    administrator_signup(client)
     created_organization = organization_create()
     created_organization_public_id = created_organization.public_id
+    logged_in_administrator = administrator_login(client)
 
     response = client.delete(
         f"/api/v1/organization/{created_organization_public_id}",
         json=organization_modified_details(),
-        headers={"Authorization": f"Bearer {logged_in_superuser['auth_token']}"},
+        headers={"Authorization": f"Bearer {logged_in_administrator['auth_token']}"},
     )
 
     assert response.status_code == 403
