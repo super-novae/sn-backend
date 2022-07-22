@@ -34,11 +34,12 @@ class Candidate(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(length=80), nullable=False, unique=True)
     public_id = db.Column(db.String(length=16), nullable=False, unique=True)
+    profile_image_url = db.Column(db.String(length=32), default="cand-default.jpg")
     organization_id = db.Column(db.Integer, db.ForeignKey("sn_organization.id"))
     election_id = db.Column(db.Integer, db.ForeignKey("sn_election.id"))
 
     def __init__(self, organization_id, election_id):
-        self.public_id = token_hex()[:16]
+        self.public_id = f"cand-{token_hex()[:27]}"
         self.organization_id = organization_id
         self.election_id = election_id
 
