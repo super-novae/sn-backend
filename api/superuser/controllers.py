@@ -24,6 +24,6 @@ def superuser_login(data):
             password=data["password"]
         )
         if superuser_password_is_correct:
-            superuser.auth_token = create_access_token(superuser.public_id)
+            superuser.auth_token = create_access_token(superuser.id)
             return superuser
     raise SuperuserWithCredentialsDoesNotExist
