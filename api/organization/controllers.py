@@ -40,7 +40,7 @@ def organization_modify_by_id(id, data):
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
 
-    organization = Organization.find_by_public_id(id)
+    organization = Organization.find_by_id(id)
 
     if organization:
         for attribute, value in data.items():
@@ -61,14 +61,14 @@ def organization_delete_by_id(id):
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
 
-    organization = Organization.find_by_public_id(id)
+    organization = Organization.find_by_id(id)
 
     if organization:
         db.session.delete(organization)
         db.session.commit()
 
         return {
-            "message": f"Organization <{organization.public_id}> deleted successfully.",
+            "message": f"Organization <{organization.id}> deleted successfully.",
             "status_code": 200,
         }
     raise OrganizationNotFound

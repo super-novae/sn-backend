@@ -4,7 +4,6 @@ from api.test_data.admin_data import *
 from api.test_data.superuser_data import *
 
 
-
 def test_administrator_signup_successful(client):
     # Remove all data from database
     truncate_db_tables()
@@ -33,7 +32,7 @@ def test_administrator_signup_successful(client):
         response.json["username"]
         == administrator_signup_correct_credentials()["username"]
     )
-    assert response.json["public_id"] == created_administrator.public_id
+    assert response.json["id"] == created_administrator.id
 
 
 def test_administrator_signup_username_exists(client):
@@ -96,7 +95,7 @@ def test_administrator_login_successful(client):
     assert response.status_code == 200
     assert response.json["email"] == administrator_login_correct_credentials()["email"]
     assert response.json["name"] == created_administrator["name"]
-    assert response.json["public_id"] == created_administrator["public_id"]
+    assert response.json["id"] == created_administrator["id"]
     assert response.json["username"] == created_administrator["username"]
     assert response.json["auth_token"]
 
@@ -141,8 +140,8 @@ def test_administrator_get_all_successful(client):
     assert response.json["administrators"][0]["email"] == created_administrator["email"]
     assert response.json["administrators"][0]["name"] == created_administrator["name"]
     assert (
-        response.json["administrators"][0]["public_id"]
-        == created_administrator["public_id"]
+        response.json["administrators"][0]["id"]
+        == created_administrator["id"]
     )
     assert (
         response.json["administrators"][0]["username"]
@@ -183,14 +182,14 @@ def test_administrator_get_by_id_successful_admin(client):
 
     # Create a request and store the response
     response = client.get(
-        f"/api/v1/administrators/{logged_in_administrator['public_id']}",
+        f"/api/v1/administrators/{logged_in_administrator['id']}",
         headers={"Authorization": f"Bearer {logged_in_administrator['auth_token']}"},
     )
 
     assert response.status_code == 200
     assert response.json["email"] == logged_in_administrator["email"]
     assert response.json["name"] == logged_in_administrator["name"]
-    assert response.json["public_id"] == logged_in_administrator["public_id"]
+    assert response.json["id"] == logged_in_administrator["id"]
     assert response.json["username"] == logged_in_administrator["username"]
 
 
@@ -205,14 +204,14 @@ def test_administrator_get_by_id_successful_superuser(client):
 
     # Create a request and store the response
     response = client.get(
-        f"/api/v1/administrators/{created_administrator['public_id']}",
+        f"/api/v1/administrators/{created_administrator['id']}",
         headers={"Authorization": f"Bearer {logged_in_superuser['auth_token']}"},
     )
 
     assert response.status_code == 200
     assert response.json["email"] == created_administrator["email"]
     assert response.json["name"] == created_administrator["name"]
-    assert response.json["public_id"] == created_administrator["public_id"]
+    assert response.json["id"] == created_administrator["id"]
     assert response.json["username"] == created_administrator["username"]
 
 
@@ -225,10 +224,9 @@ def test_administrator_get_by_id_non_existent(client):
     created_administrator = administrator_signup(client)
     logged_in_superuser = superuser_login(client)
 
-
     # Create a request and store the response
     response = client.get(
-        f"/api/v1/administrators/{created_administrator['public_id'] + 'goof'}",
+        f"/api/v1/administrators/{created_administrator['id'] + 'goof'}",
         headers={"Authorization": f"Bearer {logged_in_superuser['auth_token']}"},
     )
 

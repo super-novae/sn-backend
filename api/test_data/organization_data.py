@@ -21,3 +21,7 @@ def organization_create() -> Organization:
     db.session.commit()
 
     return organization
+
+def organization_get_test_instance() -> Organization:
+    admin = administrator_get_test_instance()
+    return Organization.query.filter_by(administrator_id=admin.id).first()

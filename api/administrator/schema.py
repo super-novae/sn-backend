@@ -3,7 +3,7 @@ from apiflask.fields import String, Email, List, Nested
 
 
 class AdministratorSchema(Schema):
-    public_id = String(dump_only=True, required=True)
+    id = String(dump_only=True, required=True)
     name = String(required=True)
     username = String(required=True)
     email = Email(required=True)
@@ -23,5 +23,5 @@ class AdministratorLoginOutputSchema(Schema):
     auth_token = String(required=True, dump_only=True)
     email = Email(required=True)
     name = String(required=True)
-    public_id = String(dump_only=True, required=True)
+    id = String(dump_only=True, required=True)
     username = String(required=True)

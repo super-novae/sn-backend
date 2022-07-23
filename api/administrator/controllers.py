@@ -65,7 +65,7 @@ def administrator_login(data):
     if admin:
         admin_password_is_correct = admin.verify_password(data["password"])
         if admin_password_is_correct:
-            admin.auth_token = create_access_token(admin.public_id)
+            admin.auth_token = create_access_token(admin.id)
             return admin
     raise AdministratorWithCredentialsDoesNotExist
 
@@ -101,7 +101,7 @@ def administrator_get_by_id(admin_id):
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
 
-    admin = Administrator.find_by_public_id(admin_id)
+    admin = Administrator.find_by_id(admin_id)
     if admin:
         return admin
 
