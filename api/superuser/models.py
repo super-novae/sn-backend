@@ -39,8 +39,8 @@ class Superuser(db.Model):
         return bcrypt.check_password_hash(self.password_hash, password)
 
     @classmethod
-    def find_by_public_id(cls, public_id):
-        return cls.query.filter_by(public_id=public_id).first()
+    def find_by__id(cls, _id):
+        return cls.query.filter_by(_id=_id).first()
 
     @classmethod
     def find_by_username(cls, username):
