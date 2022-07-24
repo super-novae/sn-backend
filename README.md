@@ -44,8 +44,8 @@ https://dbdiagram.io/d/629c499b54ce2635275fd31d
     SWAGGER_UI_BUNDLE_JS=https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.11.1/swagger-ui-bundle.min.js
     SWAGGER_UI_STANDALONE_PRESET_JS=https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.11.1/swagger-ui-standalone-preset.min.js
     REDOC_STANDALONE_JS=https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js
-    DEV_DATABASE_URL=postgresql://postgres:n2RnL79Z69inoy@localhost:5432/supernovae_dev_db
-    TEST_DATABASE_URL=postgresql://postgres:n2RnL79Z69inoy@localhost:5432/supernovae_test_db
+    DEV_DATABASE_URL=postgresql://postgres:password@localhost:5432/supernovae_dev_db
+    TEST_DATABASE_URL=postgresql://postgres:password@localhost:5432/supernovae_test_db
     ```
 
 8. Perform initial migrations
