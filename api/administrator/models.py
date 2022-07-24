@@ -2,7 +2,7 @@ from datetime import datetime
 from api.extensions import db, bcrypt
 from os import environ
 from dotenv import load_dotenv
-import secrets
+from secrets import token_urlsafe
 
 # Load environment variables
 load_dotenv()
@@ -11,8 +11,7 @@ load_dotenv()
 class Administrator(db.Model):
     __tablename__ = "sn_administrator"
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    public_id = db.Column(db.String(length=130), nullable=False, unique=True)
+    id = db.Column(db.String(length=32), nullable=False, unique=True, primary_key=True)
     name = db.Column(db.String(length=80), nullable=False)
     username = db.Column(db.String(length=15), nullable=False, unique=True)
     email = db.Column(db.String(length=80), nullable=False, unique=True)
@@ -20,7 +19,7 @@ class Administrator(db.Model):
     password_hash = db.Column(db.String(length=130), nullable=False)
 
     def __init__(self, name, username, email, password):
-        self.public_id = secrets.token_hex(64)
+        self.id = f"admin-{token_urlsafe()[:26]}"
         self.name = name
         self.username = username
         self.email = email
@@ -40,8 +39,8 @@ class Administrator(db.Model):
         return bcrypt.check_password_hash(self.password_hash, password)
 
     @classmethod
-    def find_by_public_id(cls, public_id):
-        return cls.query.filter_by(public_id=public_id).first()
+    def find_by_id(cls, id):
+        return cls.query.filter_by(id=id).first()
 
     @classmethod
     def find_by_username(cls, username):

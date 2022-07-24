@@ -9,6 +9,7 @@ def test_administrator_signup_successful(client):
     truncate_db_tables()
 
     # Create a logged in superuser instance
+    superuser_create()
     logged_in_superuser = superuser_login(client)
 
     # Create a request and store the response
@@ -31,7 +32,7 @@ def test_administrator_signup_successful(client):
         response.json["username"]
         == administrator_signup_correct_credentials()["username"]
     )
-    assert response.json["public_id"] == created_administrator.public_id
+    assert response.json["id"] == created_administrator.id
 
 
 def test_administrator_signup_username_exists(client):
@@ -39,7 +40,9 @@ def test_administrator_signup_username_exists(client):
     truncate_db_tables()
 
     # Initialize data and model instances
-    logged_in_superuser = administrator_signup(client)["superuser"]
+    superuser_create()
+    administrator_signup(client)
+    logged_in_superuser = superuser_login(client)
 
     # Create a request and store the response
     response = client.post(
@@ -60,7 +63,9 @@ def test_administrator_signup_email_exists(client):
     truncate_db_tables()
 
     # Initialize data and model instances
-    logged_in_superuser = administrator_signup(client)["superuser"]
+    superuser_create()
+    administrator_signup(client)
+    logged_in_superuser = superuser_login(client)
 
     # Create a request and store the response
     response = client.post(
@@ -79,7 +84,8 @@ def test_administrator_login_successful(client):
     truncate_db_tables()
 
     # Initialize data and model instances
-    created_administrator = administrator_signup(client)["admin"]
+    superuser_create()
+    created_administrator = administrator_signup(client)
 
     # Create a request and store the response
     response = client.post(
@@ -89,7 +95,7 @@ def test_administrator_login_successful(client):
     assert response.status_code == 200
     assert response.json["email"] == administrator_login_correct_credentials()["email"]
     assert response.json["name"] == created_administrator["name"]
-    assert response.json["public_id"] == created_administrator["public_id"]
+    assert response.json["id"] == created_administrator["id"]
     assert response.json["username"] == created_administrator["username"]
     assert response.json["auth_token"]
 
@@ -99,6 +105,7 @@ def test_administrator_login_wrong_credentials(client):
     truncate_db_tables()
 
     # Initialize data and model instances
+    superuser_create()
     administrator_signup(client)
 
     # Create a request and store the response
@@ -118,9 +125,9 @@ def test_administrator_get_all_successful(client):
     truncate_db_tables()
 
     # Initialize data and model instances
-    admin_and_superuser = administrator_signup(client)
-    created_administrator = admin_and_superuser["admin"]
-    logged_in_superuser = admin_and_superuser["superuser"]
+    superuser_create()
+    created_administrator = administrator_signup(client)
+    logged_in_superuser = superuser_login(client)
 
     # Create a request and store the response
     response = client.get(
@@ -132,10 +139,7 @@ def test_administrator_get_all_successful(client):
     assert len(response.json) == 1
     assert response.json["administrators"][0]["email"] == created_administrator["email"]
     assert response.json["administrators"][0]["name"] == created_administrator["name"]
-    assert (
-        response.json["administrators"][0]["public_id"]
-        == created_administrator["public_id"]
-    )
+    assert response.json["administrators"][0]["id"] == created_administrator["id"]
     assert (
         response.json["administrators"][0]["username"]
         == created_administrator["username"]
@@ -147,6 +151,8 @@ def test_administrator_get_all_not_authorized(client):
     truncate_db_tables()
 
     # Initialize data and model instances
+    superuser_create()
+    administrator_signup(client)
     logged_in_administrator = administrator_login(client)
 
     # Create a request and store the response
@@ -167,18 +173,20 @@ def test_administrator_get_by_id_successful_admin(client):
     truncate_db_tables()
 
     # Initialize data and model instances
+    superuser_create()
+    administrator_signup(client)
     logged_in_administrator = administrator_login(client)
 
     # Create a request and store the response
     response = client.get(
-        f"/api/v1/administrators/{logged_in_administrator['public_id']}",
+        f"/api/v1/administrators/{logged_in_administrator['id']}",
         headers={"Authorization": f"Bearer {logged_in_administrator['auth_token']}"},
     )
 
     assert response.status_code == 200
     assert response.json["email"] == logged_in_administrator["email"]
     assert response.json["name"] == logged_in_administrator["name"]
-    assert response.json["public_id"] == logged_in_administrator["public_id"]
+    assert response.json["id"] == logged_in_administrator["id"]
     assert response.json["username"] == logged_in_administrator["username"]
 
 
@@ -187,20 +195,20 @@ def test_administrator_get_by_id_successful_superuser(client):
     truncate_db_tables()
 
     # Initialize data and model instances
-    admin_and_superuser = administrator_signup(client)
-    created_administrator = admin_and_superuser["admin"]
-    logged_in_superuser = admin_and_superuser["superuser"]
+    superuser_create()
+    created_administrator = administrator_signup(client)
+    logged_in_superuser = superuser_login(client)
 
     # Create a request and store the response
     response = client.get(
-        f"/api/v1/administrators/{created_administrator['public_id']}",
+        f"/api/v1/administrators/{created_administrator['id']}",
         headers={"Authorization": f"Bearer {logged_in_superuser['auth_token']}"},
     )
 
     assert response.status_code == 200
     assert response.json["email"] == created_administrator["email"]
     assert response.json["name"] == created_administrator["name"]
-    assert response.json["public_id"] == created_administrator["public_id"]
+    assert response.json["id"] == created_administrator["id"]
     assert response.json["username"] == created_administrator["username"]
 
 
@@ -209,13 +217,13 @@ def test_administrator_get_by_id_non_existent(client):
     truncate_db_tables()
 
     # Initialize data and model instances
-    admin_and_superuser = administrator_signup(client)
-    created_administrator = admin_and_superuser["admin"]
-    logged_in_superuser = admin_and_superuser["superuser"]
+    superuser_create()
+    created_administrator = administrator_signup(client)
+    logged_in_superuser = superuser_login(client)
 
     # Create a request and store the response
     response = client.get(
-        f"/api/v1/administrators/{created_administrator['public_id'] + 'goof'}",
+        f"/api/v1/administrators/{created_administrator['id'] + 'goof'}",
         headers={"Authorization": f"Bearer {logged_in_superuser['auth_token']}"},
     )
 

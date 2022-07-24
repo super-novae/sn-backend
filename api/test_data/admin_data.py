@@ -1,4 +1,5 @@
 from api.extensions import fake
+from api.administrator.models import Administrator
 from .superuser_data import superuser_login
 
 data = {
@@ -18,7 +19,7 @@ def administrator_signup(client):
         headers={"Authorization": f"Bearer {logged_in_superuser['auth_token']}"},
     )
 
-    return {"admin": response.json, "superuser": logged_in_superuser}
+    return response.json
 
 
 def administrator_signup_correct_credentials():
@@ -44,7 +45,6 @@ def administrator_signup_email_exists():
 
 
 def administrator_login(client):
-    administrator_signup(client)
     response = client.post(
         "/api/v1/administrators/login", json=administrator_login_correct_credentials()
     )
@@ -58,3 +58,7 @@ def administrator_login_correct_credentials():
 
 def administrator_login_wrong_credentials():
     return {"email": data["email"], "password": data["password"] + "goof"}
+
+
+def administrator_get_test_instance() -> Administrator:
+    return Administrator.find_by_email(data["email"])

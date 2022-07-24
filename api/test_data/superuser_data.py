@@ -20,7 +20,6 @@ def superuser_create():
 
 
 def superuser_login(client):
-    superuser_create()
     response = client.post(
         "/api/v1/superuser/login", json=superuser_login_correct_credentials()
     )
@@ -38,3 +37,7 @@ def superuser_login_correct_credentials():
 
 def superuser_login_wrong_credentials():
     return {"username": data["username"], "password": data["password"] + "goof"}
+
+
+def superuser_get():
+    return Superuser.find_by_username(data["username"])

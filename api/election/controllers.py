@@ -1,6 +1,12 @@
 from .errors import CandidateDoesNotExist, ElectionDoesNotExist
 from .models import Candidate, Election
-from .schema import CandidateSchema, CandidatesSchema, ElectionSchema, ElectionsSchema
+from .schema import (
+    CandidateSchema,
+    CandidatesSchema,
+    ElectionSchema,
+    ElectionsSchema,
+    ElectionUpdateSchema,
+)
 from api.extensions import db
 from apiflask import APIBlueprint
 from flask_jwt_extended import jwt_required, get_jwt_identity
@@ -37,7 +43,7 @@ def election_create(data):
 
 
 @election.put("/<election_id>")
-@election.input(ElectionSchema)
+@election.input(ElectionUpdateSchema)
 @election.output(GenericMessage)
 @election.doc(
     summary="Election modify",
@@ -45,13 +51,13 @@ def election_create(data):
     responses=[200, 403, 404],
 )
 @jwt_required()
-def election_modify(data, election_id):
+def election_modify(election_id, data):
     # Perform security checks
     user_has_required_roles = has_roles(["admin"], get_jwt_identity())
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
 
-    election = Election.find_election_by_public_id(election_id)
+    election = Election.find_by_id(election_id)
 
     if not election:
         raise ElectionDoesNotExist
@@ -78,7 +84,7 @@ def election_delete(election_id):
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
 
-    election = Election.find_election_by_public_id(election_id)
+    election = Election.find_by_id(election_id)
 
     if not election:
         raise ElectionDoesNotExist
@@ -99,11 +105,13 @@ def election_delete(election_id):
 @jwt_required()
 def election_get_by_id(election_id):
     # Perform security checks
-    user_has_required_roles = has_roles(["admin", "voter"], get_jwt_identity())
+    user_has_required_roles = has_roles(
+        ["admin"], get_jwt_identity()
+    )  # TODO: Include voters
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
 
-    election = Election.find_election_by_public_id(election_id)
+    election = Election.find_by_id(election_id)
 
     if not election:
         raise ElectionDoesNotExist
@@ -111,7 +119,7 @@ def election_get_by_id(election_id):
     return election, 200
 
 
-@election.get("/<election_id>/organization/<organization_id>")
+@election.get("/organization/<organization_id>")
 @election.output(ElectionsSchema)
 @election.doc(
     summary="Election Get All by Organization Id",
@@ -119,7 +127,7 @@ def election_get_by_id(election_id):
     responses=[200, 403],
 )
 @jwt_required()
-def election_get_all_by_organization_id(election_id, organization_id):
+def election_get_all_by_organization_id(organization_id):
     # Perform security checks
     user_has_required_roles = has_roles(["admin"], get_jwt_identity())
     if not user_has_required_roles:
@@ -150,7 +158,7 @@ def election_get_all_by_organization_id(election_id, organization_id):
     responses=[201, 403],
 )
 @jwt_required()
-def election_create_candidate(data, election_id):
+def election_create_candidate(election_id, data):
     # Perform security checks
     user_has_required_roles = has_roles(["admin"], get_jwt_identity())
     if not user_has_required_roles:
@@ -158,10 +166,14 @@ def election_create_candidate(data, election_id):
 
     candidate = Candidate(**data)
 
+    db.session.add(candidate)
+    db.session.commit()
+
     return candidate, 201
 
 
 @election.put("/<election_id>/candidates/<candidate_id>")
+@election.input(ElectionUpdateSchema)
 @election.output(GenericMessage)
 @election.doc(
     summary="Election Modify Candidate",
@@ -169,15 +181,13 @@ def election_create_candidate(data, election_id):
     responses=[200, 403, 404],
 )
 @jwt_required()
-def election_modify_candidate(data, candidate_id, election_id):
+def election_modify_candidate(election_id, candidate_id, data):
     # Perform security checks
     user_has_required_roles = has_roles(["admin"], get_jwt_identity())
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
 
-    candidate = Candidate.find_candidate_by_public_id(
-        public_id=candidate_id, election_id=election_id
-    )
+    candidate = Candidate.find_candidate_by_id(id=candidate_id, election_id=election_id)
 
     if not candidate:
         raise CandidateDoesNotExist
@@ -185,7 +195,7 @@ def election_modify_candidate(data, candidate_id, election_id):
     for attribute, value in data.items():
         setattr(candidate, attribute, value)
 
-    db.sesssion.commit()
+    db.session.commit()
 
     return {"message": "Candidate modified successfully"}, 200
 
@@ -198,15 +208,13 @@ def election_modify_candidate(data, candidate_id, election_id):
     responses=[200, 403, 404],
 )
 @jwt_required()
-def election_delete_candidate(candidate_id, election_id):
+def election_delete_candidate(election_id, candidate_id):
     # Perform security checks
     user_has_required_roles = has_roles(["admin"], get_jwt_identity())
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
 
-    candidate = Candidate.find_candidate_by_public_id(
-        public_id=candidate_id, election_id=election_id
-    )
+    candidate = Candidate.find_candidate_by_id(id=candidate_id, election_id=election_id)
 
     if not candidate:
         raise CandidateDoesNotExist
@@ -227,16 +235,15 @@ def election_delete_candidate(candidate_id, election_id):
 @jwt_required()
 def election_get_candidate_by_id(election_id, candidate_id):
     # Perform security checks
-    user_has_required_roles = has_roles(["admin", "voter"], get_jwt_identity())
+    # TODO: Add votor to user_has_required_roles
+    user_has_required_roles = has_roles(["admin"], get_jwt_identity())
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
 
-    candidate = Candidate.find_candidate_by_public_id(
-        public_id=candidate_id, election_id=election_id
-    )
+    candidate = Candidate.find_candidate_by_id(id=candidate_id, election_id=election_id)
 
     if not candidate:
-        raise ElectionDoesNotExist
+        raise CandidateDoesNotExist
 
     return candidate, 200
 
@@ -251,7 +258,8 @@ def election_get_candidate_by_id(election_id, candidate_id):
 @jwt_required()
 def election_get_all_candidates_by_election_id(election_id):
     # Perform security checks
-    user_has_required_roles = has_roles(["admin", "voter"], get_jwt_identity())
+    # TODO: Add votor to user_has_required_roles
+    user_has_required_roles = has_roles(["admin"], get_jwt_identity())
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
 

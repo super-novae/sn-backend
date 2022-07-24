@@ -1,5 +1,5 @@
 from .models import Organization
-from .schema import OrganizationSchema
+from .schema import OrganizationSchema, OrganizationModifySchema
 from .errors import OrganizationNotFound
 from api.extensions import db
 from api.generic.methods import has_roles
@@ -18,7 +18,7 @@ organization = APIBlueprint(
 @jwt_required()
 def organization_create(data):
     # Perform security checks
-    user_has_required_roles = has_roles(["admin"], get_jwt_identity())
+    user_has_required_roles = has_roles(["super"], get_jwt_identity())
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
 
@@ -31,16 +31,16 @@ def organization_create(data):
 
 
 @organization.put("/<id>")
-@organization.input(OrganizationSchema)
+@organization.input(OrganizationModifySchema)
 @organization.output(OrganizationSchema)
 @jwt_required()
 def organization_modify_by_id(id, data):
     # Perform security checks
-    user_has_required_roles = has_roles(["admin"], get_jwt_identity())
+    user_has_required_roles = has_roles(["super"], get_jwt_identity())
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
 
-    organization = Organization.find_by_public_id(id)
+    organization = Organization.find_by_id(id)
 
     if organization:
         for attribute, value in data.items():
@@ -57,18 +57,18 @@ def organization_modify_by_id(id, data):
 @jwt_required()
 def organization_delete_by_id(id):
     # Perform security checks
-    user_has_required_roles = has_roles(["admin"], get_jwt_identity())
+    user_has_required_roles = has_roles(["super"], get_jwt_identity())
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
 
-    organization = Organization.find_by_public_id(id)
+    organization = Organization.find_by_id(id)
 
     if organization:
         db.session.delete(organization)
         db.session.commit()
 
         return {
-            "message": f"Organization <{organization.public_id}> deleted successfully.",
+            "message": f"Organization <{organization.id}> deleted successfully.",
             "status_code": 200,
         }
     raise OrganizationNotFound
