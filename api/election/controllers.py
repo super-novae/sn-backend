@@ -166,7 +166,7 @@ def election_create_candidate(election_id, data):
         raise UserDoesNotHaveRequiredRoles
 
     candidate = Candidate(**data)
-    
+
     db.session.add(candidate)
     db.session.commit()
 
@@ -188,9 +188,7 @@ def election_modify_candidate(election_id, candidate_id, data):
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
 
-    candidate = Candidate.find_candidate_by_id(
-        id=candidate_id, election_id=election_id
-    )
+    candidate = Candidate.find_candidate_by_id(id=candidate_id, election_id=election_id)
 
     if not candidate:
         raise CandidateDoesNotExist
@@ -217,9 +215,7 @@ def election_delete_candidate(election_id, candidate_id):
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
 
-    candidate = Candidate.find_candidate_by_id(
-        id=candidate_id, election_id=election_id
-    )
+    candidate = Candidate.find_candidate_by_id(id=candidate_id, election_id=election_id)
 
     if not candidate:
         raise CandidateDoesNotExist
@@ -240,14 +236,12 @@ def election_delete_candidate(election_id, candidate_id):
 @jwt_required()
 def election_get_candidate_by_id(election_id, candidate_id):
     # Perform security checks
-    #TODO: Add votor to user_has_required_roles
+    # TODO: Add votor to user_has_required_roles
     user_has_required_roles = has_roles(["admin"], get_jwt_identity())
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
 
-    candidate = Candidate.find_candidate_by_id(
-        id=candidate_id, election_id=election_id
-    )
+    candidate = Candidate.find_candidate_by_id(id=candidate_id, election_id=election_id)
 
     if not candidate:
         raise CandidateDoesNotExist
@@ -265,7 +259,7 @@ def election_get_candidate_by_id(election_id, candidate_id):
 @jwt_required()
 def election_get_all_candidates_by_election_id(election_id):
     # Perform security checks
-    #TODO: Add votor to user_has_required_roles
+    # TODO: Add votor to user_has_required_roles
     user_has_required_roles = has_roles(["admin"], get_jwt_identity())
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles

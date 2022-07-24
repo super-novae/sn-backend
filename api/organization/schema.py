@@ -8,5 +8,6 @@ class OrganizationSchema(Schema):
     name = String(required=True, validate=[Length(4, 256)])
     id = String(required=True, dump_only=True, validate=[Length(32)])
 
+
 class OrganizationModifySchema(Schema):
     name = String(required=True, validate=[Length(4, 256)])

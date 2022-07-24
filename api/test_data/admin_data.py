@@ -59,5 +59,6 @@ def administrator_login_correct_credentials():
 def administrator_login_wrong_credentials():
     return {"email": data["email"], "password": data["password"] + "goof"}
 
+
 def administrator_get_test_instance() -> Administrator:
     return Administrator.find_by_email(data["email"])

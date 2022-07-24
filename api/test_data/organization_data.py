@@ -3,7 +3,6 @@ from ..organization.models import Organization
 from ..test_data.admin_data import administrator_get_test_instance
 
 
-
 def organization_details():
     admin = administrator_get_test_instance()
     return {"name": fake.company(), "administrator_id": admin.id}
@@ -21,6 +20,7 @@ def organization_create() -> Organization:
     db.session.commit()
 
     return organization
+
 
 def organization_get_test_instance() -> Organization:
     admin = administrator_get_test_instance()

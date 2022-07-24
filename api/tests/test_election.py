@@ -86,9 +86,7 @@ def test_election_modify_successful(client):
         headers={"Authorization": f"Bearer {administrator['auth_token']}"},
     )
 
-    modified_election = Election.find_by_id(
-        election_test_instance.id
-    )
+    modified_election = Election.find_by_id(election_test_instance.id)
     assert response.status_code == 200
     assert response.json["message"] == "Election modified successfully"
     assert modified_election.name == election_modified_details()["name"]
@@ -167,9 +165,7 @@ def test_election_delete_successful(client):
         headers={"Authorization": f"Bearer {administrator['auth_token']}"},
     )
 
-    deleted_election = Election.find_by_id(
-        election_test_instance.id
-    )
+    deleted_election = Election.find_by_id(election_test_instance.id)
 
     assert response.status_code == 200
     assert response.json["message"] == "Election deleted successfully"
@@ -435,9 +431,9 @@ def test_election_modify_candidate_successful(client):
         headers={"Authorization": f"Bearer {administrator['auth_token']}"},
         json=candidate_modified_details(),
     )
-    
+
     assert response.status_code == 200
-    assert response.json['message'] == "Candidate modified successfully"
+    assert response.json["message"] == "Candidate modified successfully"
 
     # Clear database after tests
     truncate_db_tables()
@@ -446,7 +442,7 @@ def test_election_modify_candidate_successful(client):
 def test_election_modify_candidate_unauthorized(client):
     # Clear database before tests
     truncate_db_tables()
-    
+
     # Initialize the data and model instances
     superuser_create()
     administrator_signup(client)
@@ -462,7 +458,7 @@ def test_election_modify_candidate_unauthorized(client):
         headers={"Authorization": f"Bearer {superuser['auth_token']}"},
         json=candidate_modified_details(),
     )
-    
+
     assert response.status_code == 403
     assert (
         response.json["message"]
@@ -475,7 +471,7 @@ def test_election_modify_candidate_unauthorized(client):
 def test_election_modify_candidate_non_existent(client):
     # Clear database before tests
     truncate_db_tables()
-    
+
     # Initialize the data and model instances
     superuser_create()
     administrator_signup(client)
@@ -491,9 +487,9 @@ def test_election_modify_candidate_non_existent(client):
         headers={"Authorization": f"Bearer {administrator['auth_token']}"},
         json=candidate_modified_details(),
     )
-    
+
     assert response.status_code == 404
-    assert response.json['message'] == "A candidate with the given ID does not exist"
+    assert response.json["message"] == "A candidate with the given ID does not exist"
 
     # Clear database after tests
     truncate_db_tables()
@@ -502,25 +498,23 @@ def test_election_modify_candidate_non_existent(client):
 def test_election_delete_candidate_successful(client):
     # Clear database before tests
     truncate_db_tables()
-    
+
     # Initialize the data and model instances
     superuser_create()
     administrator_signup(client)
     organization_create()
     election = election_create()
     candidate = candidate_create()
-    
+
     administrator = administrator_login(client)
 
-    
     response = client.delete(
         f"/api/v1/elections/{election.id}/candidates/{candidate.id}",
         headers={"Authorization": f"Bearer {administrator['auth_token']}"},
     )
-    
-    assert response.status_code == 200
-    assert response.json['message'] == "Candidate deleted successfully"
 
+    assert response.status_code == 200
+    assert response.json["message"] == "Candidate deleted successfully"
 
     # Clear database after tests
     truncate_db_tables()
@@ -529,22 +523,21 @@ def test_election_delete_candidate_successful(client):
 def test_election_delete_candidate_unauthorized(client):
     # Clear database before tests
     truncate_db_tables()
-    
+
     # Initialize the data and model instances
     superuser_create()
     administrator_signup(client)
     organization_create()
     election = election_create()
     candidate = candidate_create()
-    
+
     superuser = superuser_login(client)
 
-    
     response = client.delete(
         f"/api/v1/elections/{election.id}/candidates/{candidate.id}",
         headers={"Authorization": f"Bearer {superuser['auth_token']}"},
     )
-    
+
     assert response.status_code == 403
     assert (
         response.json["message"]
@@ -558,23 +551,23 @@ def test_election_delete_candidate_unauthorized(client):
 def test_election_delete_candidate_non_existent(client):
     # Clear database before tests
     truncate_db_tables()
-    
+
     # Initialize the data and model instances
     superuser_create()
     administrator_signup(client)
     organization_create()
     election = election_create()
     candidate = candidate_create()
-    
+
     administrator = administrator_login(client)
 
     response = client.delete(
         f"/api/v1/elections/{election.id}/candidates/{candidate.id[:5] + candidate.id[5:][::-1]}",
         headers={"Authorization": f"Bearer {administrator['auth_token']}"},
     )
-    
+
     assert response.status_code == 404
-    assert response.json['message'] == "A candidate with the given ID does not exist"
+    assert response.json["message"] == "A candidate with the given ID does not exist"
 
     # Clear database after tests
     truncate_db_tables()
@@ -583,14 +576,14 @@ def test_election_delete_candidate_non_existent(client):
 def test_election_get_candidate_by_id_successful(client):
     # Clear database before tests
     truncate_db_tables()
-    
+
     # Initialize the data and model instances
     superuser_create()
     administrator_signup(client)
     organization = organization_create()
     election = election_create()
     candidate = candidate_create()
-    
+
     administrator = administrator_login(client)
 
     response = client.get(
@@ -599,9 +592,9 @@ def test_election_get_candidate_by_id_successful(client):
     )
 
     assert response.status_code == 200
-    assert response.json['name'] == candidate.name
-    assert response.json['election_id'] == election.id
-    assert response.json['organization_id'] == organization.id
+    assert response.json["name"] == candidate.name
+    assert response.json["election_id"] == election.id
+    assert response.json["organization_id"] == organization.id
 
     # Clear database after tests
     truncate_db_tables()
@@ -610,27 +603,27 @@ def test_election_get_candidate_by_id_successful(client):
 def test_election_get_candidate_by_id_unauthorized(client):
     # Clear database before tests
     truncate_db_tables()
-    
+
     # Initialize the data and model instances
     superuser_create()
     administrator_signup(client)
     organization = organization_create()
     election = election_create()
     candidate = candidate_create()
-    
+
     superuser = superuser_login(client)
 
     response = client.get(
         f"/api/v1/elections/{election.id}/candidates/{candidate.id}",
         headers={"Authorization": f"Bearer {superuser['auth_token']}"},
     )
-    
+
     assert response.status_code == 403
     assert (
         response.json["message"]
         == "User does not have the required permissions to perform action"
     )
-    
+
     # Clear database after tests
     truncate_db_tables()
 
@@ -638,24 +631,24 @@ def test_election_get_candidate_by_id_unauthorized(client):
 def test_election_get_candidate_by_id_non_existent(client):
     # Clear database before tests
     truncate_db_tables()
-    
+
     # Initialize the data and model instances
     superuser_create()
     administrator_signup(client)
     organization = organization_create()
     election = election_create()
     candidate = candidate_create()
-    
+
     administrator = administrator_login(client)
 
     response = client.get(
         f"/api/v1/elections/{election.id}/candidates/{candidate.id[:5] + candidate.id[5:][::-1]}",
         headers={"Authorization": f"Bearer {administrator['auth_token']}"},
     )
-    
+
     assert response.status_code == 404
-    assert response.json['message'] == "A candidate with the given ID does not exist"    
-    
+    assert response.json["message"] == "A candidate with the given ID does not exist"
+
     # Clear database after tests
     truncate_db_tables()
 
@@ -663,25 +656,24 @@ def test_election_get_candidate_by_id_non_existent(client):
 def test_election_get_all_candidates_by_election_id_successful(client):
     # Clear database before tests
     truncate_db_tables()
-    
+
     # Initialize the data and model instances
     superuser_create()
     administrator_signup(client)
     organization_create()
     election = election_create()
     candidate_create()
-    
+
     administrator = administrator_login(client)
 
     response = client.get(
         f"/api/v1/elections/{election.id}/candidates/",
         headers={"Authorization": f"Bearer {administrator['auth_token']}"},
     )
-    
+
     assert response.status_code == 200
-    assert response.json['candidates']
-    
-    
+    assert response.json["candidates"]
+
     # Clear database after tests
     truncate_db_tables()
 
@@ -689,14 +681,14 @@ def test_election_get_all_candidates_by_election_id_successful(client):
 def test_election_get_all_candidates_by_election_id_unauthorized(client):
     # Clear database before tests
     truncate_db_tables()
-    
-        # Initialize the data and model instances
+
+    # Initialize the data and model instances
     superuser_create()
     administrator_signup(client)
     organization = organization_create()
     election = election_create()
     candidate = candidate_create()
-    
+
     superuser = superuser_login(client)
 
     response = client.get(

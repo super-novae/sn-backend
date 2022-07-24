@@ -8,7 +8,9 @@ class Organization(db.Model):
     id = db.Column(db.String(length=32), nullable=False, unique=True, primary_key=True)
     name = db.Column(db.String(length=256), nullable=False)
     elections = db.relationship("Election")
-    administrator_id = db.Column(db.String(length=32), db.ForeignKey("sn_administrator.id"), nullable=False)
+    administrator_id = db.Column(
+        db.String(length=32), db.ForeignKey("sn_administrator.id"), nullable=False
+    )
 
     def __init__(self, name, administrator_id):
         self.id = f"org-{token_hex()[:28]}"

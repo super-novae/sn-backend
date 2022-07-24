@@ -139,10 +139,7 @@ def test_administrator_get_all_successful(client):
     assert len(response.json) == 1
     assert response.json["administrators"][0]["email"] == created_administrator["email"]
     assert response.json["administrators"][0]["name"] == created_administrator["name"]
-    assert (
-        response.json["administrators"][0]["id"]
-        == created_administrator["id"]
-    )
+    assert response.json["administrators"][0]["id"] == created_administrator["id"]
     assert (
         response.json["administrators"][0]["username"]
         == created_administrator["username"]

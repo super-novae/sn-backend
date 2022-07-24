@@ -68,9 +68,7 @@ def test_organization_modify_by_id_successful(client):
         headers={"Authorization": f"Bearer {superuser['auth_token']}"},
     )
 
-    modified_organization = Organization.find_by_id(
-        organization.id
-    )
+    modified_organization = Organization.find_by_id(organization.id)
 
     assert response.status_code == 200
     assert response.json["id"] == modified_organization.id
@@ -135,11 +133,8 @@ def test_organization_delete_by_id_successful(client):
         json=organization_modified_details(),
         headers={"Authorization": f"Bearer {superuser['auth_token']}"},
     )
-    
-    deleted_organization = Organization.find_by_id(
-        organization.id
-    )
 
+    deleted_organization = Organization.find_by_id(organization.id)
 
     assert response.status_code == 200
     assert (

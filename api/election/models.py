@@ -35,7 +35,9 @@ class Candidate(db.Model):
     id = db.Column(db.String(length=32), nullable=False, unique=True, primary_key=True)
     name = db.Column(db.String(length=80), nullable=False, unique=True)
     profile_image_url = db.Column(db.String(length=150), default="cand-default.jpg")
-    organization_id = db.Column(db.String(length=32), db.ForeignKey("sn_organization.id"))
+    organization_id = db.Column(
+        db.String(length=32), db.ForeignKey("sn_organization.id")
+    )
     election_id = db.Column(db.String(length=32), db.ForeignKey("sn_election.id"))
 
     def __init__(self, name, organization_id, election_id):
