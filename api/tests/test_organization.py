@@ -3,7 +3,6 @@ from ..organization.models import Organization
 from ..test_data.admin_data import administrator_login, administrator_signup
 from ..test_data.organization_data import (
     organization_details,
-    organization_get_test_instance,
     organization_modified_details,
     organization_create,
 )

@@ -1,5 +1,5 @@
 from apiflask import Schema
-from apiflask.fields import String, List, Nested, Integer
+from apiflask.fields import String, List, Nested
 from apiflask.validators import Length, Regexp, URL
 
 

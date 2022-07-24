@@ -13,7 +13,6 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from api.generic.errors import UserDoesNotHaveRequiredRoles
 from api.generic.methods import has_roles
 from api.generic.responses import GenericMessage
-from api.organization.models import Organization
 
 election = APIBlueprint(
     "election", __name__, tag="Election", url_prefix="/api/v1/elections"

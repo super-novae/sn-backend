@@ -14,7 +14,6 @@ from ..test_data.election_data import (
     candidate_create,
     candidate_details,
     candidate_modified_details,
-    candidate_get_test_instance,
 )
 
 

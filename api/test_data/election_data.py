@@ -1,6 +1,5 @@
 from api.extensions import fake, db
 from ..election.models import Candidate, Election
-from .admin_data import administrator_get_test_instance
 from .organization_data import organization_get_test_instance
 
 
