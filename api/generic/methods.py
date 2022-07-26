@@ -1,5 +1,6 @@
 from api.administrator.models import Administrator
 from api.superuser.models import Superuser
+from api.voter.models import Voter
 
 # from api.voter.models import Voter
 from .errors import *
@@ -7,7 +8,7 @@ from .errors import *
 
 def has_roles(role_list, id):
     # TODO: Possible optimization
-    roles = {"super": Superuser, "admin": Administrator}
+    roles = {"super": Superuser, "admin": Administrator, "voter": Voter}
     # roles = {"super": Superuser, "admin": Administrator, "voter": Voter}
 
     current_user_roles = []
