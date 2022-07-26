@@ -12,9 +12,10 @@ class Election(db.Model):
         db.String(length=32), db.ForeignKey("sn_organization.id")
     )
 
-    def __init__(self, name, organization_id):
+    def __init__(self, name, organization_id, route_name):
         self.id = f"elec-{token_hex()[:27]}"
         self.name = name
+        self.route_name = route_name
         self.organization_id = organization_id
 
     @classmethod
@@ -34,11 +35,13 @@ class Office(db.Model):
     __tablename__ = "sn_office"
     
     id = db.Column(db.String(length=32), nullable=False, primary_key=True)
+    name = db.Column(db.String(length=60), nullable=False)
     route_name = db.Column(db.String(length=50), nullable=False)
     election_id = db.Column(db.String(length=32), db.ForeignKey("sn_election.id"))
     
-    def __init__(self, route_name, election_id) -> None:
+    def __init__(self, name, route_name, election_id) -> None:
         self.id = f"off-{token_hex()[:28]}"
+        self.name = name
         self.route_name = route_name
         self.election_id = election_id
     
@@ -64,12 +67,14 @@ class Candidate(db.Model):
     election_id = db.Column(db.String(length=32), db.ForeignKey("sn_election.id"))
     office_id = db.Column(db.String(length=32), db.ForeignKey("sn_office.id"))
 
-    def __init__(self, name, organization_id, election_id):
+    def __init__(self, name, organization_id, programme, election_id, office_id):
         self.id = f"cand-{token_hex()[:27]}"
         self.name = name
         self.profile_image_url = f"https://url-to-s3-buckets/candidates/{self.id}"
+        self.programme = programme
         self.organization_id = organization_id
         self.election_id = election_id
+        self.office_id = office_id
 
     @classmethod
     def find_candidate_by_id(cls, id, election_id):

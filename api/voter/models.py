@@ -17,7 +17,7 @@ class Voter(db.Model):
     date_created = db.Column(db.DateTime(), nullable=False)
     password_hash = db.Column(db.String(length=130), nullable=False)
     telephone_number = db.Column(db.String(10), nullable=False, unique=True)
-    organization_id = db.Column(db.String(length=32), db.ForeignKey("sn_organization.id", nullable=False))
+    organization_id = db.Column(db.String(length=32), db.ForeignKey("sn_organization.id"), nullable=False)
     
     def __init__(self, name, username, email, telephone_number, organization_id):
         self.id = f"voter-{token_urlsafe()[:26]}"
@@ -62,10 +62,10 @@ class VoterGroup(db.Model):
 
     id = db.Column(db.String(length=32), nullable=False, unique=True, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
-    organization_id = db.Column(db.String(length=32), db.ForeignKey("sn_organization.id", nullable=False))
+    organization_id = db.Column(db.String(length=32), db.ForeignKey("sn_organization.id"), nullable=False)
     
     def __init__(self, name, organization_id):
-        self.id = f"voter-{token_urlsafe()[:26]}"
+        self.id = f"vot-grp-{token_urlsafe()[:24]}"
         self.name = name
         self.organization_id = organization_id
     
@@ -84,11 +84,13 @@ class VoterGroupElection(db.Model):
     __tablename__ = "sn_voter_group_election"
     
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    voter_group_id = db.Column()
-    election_id = db.Column()
+    voter_group_id = db.Column(db.String(length=32), db.ForeignKey("sn_voter_group.id"), nullable=False)
+    election_id = db.Column(db.String(length=32), db.ForeignKey("sn_election.id"), nullable=False)
 
 class Votes(db.Model):
-    __tablename__ = "sn_voter"
+    __tablename__ = "sn_votes"
+    
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     voter_id = db.Column(db.String(length=32), db.ForeignKey("sn_voter.id"), nullable=False)
     election_id = db.Column(db.String(length=32), db.ForeignKey("sn_election.id"), nullable=False)
     candidate_id = db.Column(db.String(length=32), db.ForeignKey("sn_candidate.id"), nullable=False)
