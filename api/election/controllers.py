@@ -1,11 +1,17 @@
-from .errors import CandidateDoesNotExist, ElectionDoesNotExist
-from .models import Candidate, Election
+from .errors import (
+    CandidateDoesNotExist, 
+    ElectionDoesNotExist, 
+    OfficeDoesNotExist)
+from .models import Candidate, Election, Office
 from .schema import (
     CandidateSchema,
     CandidatesSchema,
     ElectionSchema,
     ElectionsSchema,
     ElectionUpdateSchema,
+    OfficeSchema,
+    OfficesSchema,
+    OfficeUpdateSchema
 )
 from api.extensions import db
 from apiflask import APIBlueprint
@@ -148,6 +154,119 @@ def election_get_all_by_organization_id(organization_id):
 
 #     return {"elections": elections}
 
+@election.post("/<election_id>/office/")
+@election.input(OfficeSchema)
+@election.output(OfficeSchema)
+@election.doc(
+    summary="Election Create Office",
+    description="An endpoint to create an office in an election",
+    responses=[201, 403],
+)
+@jwt_required()
+def election_create_office(election_id, data):
+    # Perform security checks
+    user_has_required_roles = has_roles(["admin"], get_jwt_identity())
+    if not user_has_required_roles:
+        raise UserDoesNotHaveRequiredRoles
+    
+    office = Office(**data)
+    
+    db.session.add(office)
+    db.session.commit()
+    
+    return office, 201
+
+@election.put("/<election_id>/office/<office_id>")
+@election.input(OfficeUpdateSchema)
+@election.output(GenericMessage)
+@election.doc(
+    summary="Election Modify Office",
+    description="An endpoint to modify an office in an election",
+    responses=[200, 403, 404],
+)
+@jwt_required()
+def election_modify_office(election_id, office_id, data):
+    # Perform security checks
+    user_has_required_roles = has_roles(["admin"], get_jwt_identity())
+    if not user_has_required_roles:
+        raise UserDoesNotHaveRequiredRoles
+    
+    office = Office.find_by_id(id=office_id)
+    
+    if not office:
+        raise OfficeDoesNotExist
+    
+    for attribute, value in data.items():
+        setattr(office, attribute, value)
+    
+    db.session.commit()
+    
+    return {"message": "Office modified successfully"}, 200
+
+@election.delete("/<election_id>/office/<office_id>")
+@election.output(GenericMessage)
+@election.doc(
+    summary="Election Delete Office",
+    description="An endpoint to delete an office in an election",
+    responses=[200, 403, 404],
+)
+@jwt_required()
+def election_delete_office(election_id, office_id):
+    # Perform security checks
+    user_has_required_roles = has_roles(["admin"], get_jwt_identity())
+    if not user_has_required_roles:
+        raise UserDoesNotHaveRequiredRoles
+
+    office = Office.find_by_id(id=office_id)
+    
+    if not office:
+        raise OfficeDoesNotExist
+    
+    db.session.delete(office)
+    db.session.commit()
+    
+    return {"message": "Office deleted successfully"}, 200
+
+
+@election.get("/<election_id>/office/<office_id>")
+@election.output(OfficeSchema)
+@election.doc(
+    summary="Election Get Office By Id",
+    description="An endpoint to get an office by id in an election",
+    responses=[200, 403, 404],
+)
+@jwt_required()
+def election_get_office_by_id(election_id, office_id):
+    # Perform security checks
+    user_has_required_roles = has_roles(["admin", "voter"], get_jwt_identity())
+    if not user_has_required_roles:
+        raise UserDoesNotHaveRequiredRoles
+    
+    office = Office.find_by_id(id=office_id)
+    
+    if not office:
+        raise OfficeDoesNotExist
+    
+    return office, 200
+
+@election.post("/<election_id>/office/")
+@election.output(OfficesSchema)
+@election.doc(
+    summary="Election Get Office By Id",
+    description="An endpoint to get all offices by election id",
+    responses=[200, 403],
+)
+@jwt_required()
+def election_get_all_offices_by_election_id(election_id):
+    # Perform security checks
+    user_has_required_roles = has_roles(["admin", "voter"], get_jwt_identity())
+    if not user_has_required_roles:
+        raise UserDoesNotHaveRequiredRoles
+    
+    offices = Office.find_all_by_election_id(election_id=election_id)
+    
+    return {"offices": offices}, 200
+
 
 @election.post("/<election_id>/candidates/")
 @election.input(CandidateSchema)
@@ -235,8 +354,7 @@ def election_delete_candidate(election_id, candidate_id):
 @jwt_required()
 def election_get_candidate_by_id(election_id, candidate_id):
     # Perform security checks
-    # TODO: Add votor to user_has_required_roles
-    user_has_required_roles = has_roles(["admin"], get_jwt_identity())
+    user_has_required_roles = has_roles(["admin", "voter"], get_jwt_identity())
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
 
