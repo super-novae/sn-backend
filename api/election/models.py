@@ -8,27 +8,41 @@ class Election(db.Model):
     id = db.Column(db.String(length=32), nullable=False, unique=True, primary_key=True)
     name = db.Column(db.String(length=120), nullable=False, unique=True)
     route_name = db.Column(db.String(length=50), nullable=False, unique=True)
+    type = db.Column(db.String(length=10), nullable=False)
+    college = db.Column(db.String(length=100), nullable=True)
+    programme = db.Column(db.String(length=10), nullable=True)
     organization_id = db.Column(
         db.String(length=32), db.ForeignKey("sn_organization.id")
     )
 
-    def __init__(self, name, organization_id, route_name):
+    def __init__(self, name, route_name, type, organization_id, college="", programme=""):
         self.id = f"elec-{token_hex()[:27]}"
         self.name = name
         self.route_name = route_name
+        self.type = type
+        self.college = college
+        self.programme = programme
         self.organization_id = organization_id
 
     @classmethod
     def find_by_id(cls, id):
         return cls.query.filter_by(id=id).first()
+    
+    @classmethod
+    def find_by_type(cls,type):
+        return cls.query.filter_by(type=type).first()
+    
+    @classmethod
+    def find_by_college(cls, college):
+        return cls.query.filter_by(college=college).first()
+    
+    @classmethod
+    def find_by_programme(cls, programme):
+        return cls.query.filter_by(programme=programme).first()
 
     @classmethod
     def find_all_elections_by_organization_id(cls, organization_id):
         return cls.query.filter_by(organization_id=organization_id).all()
-
-    # @classmethod
-    # def find_all_elections_by_voter_id(cls, voter_id):
-    #     return cls.query.filter_by(voter_id=voter_id).all()
 
 
 class Office(db.Model):
