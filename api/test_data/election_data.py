@@ -8,7 +8,8 @@ def election_details():
     return {
         "name": organization.name + " Elections",
         "organization_id": organization.id,
-        "route_name": fake.word()
+        "route_name": fake.word(),
+        "type": "SRC"
     }
 
 

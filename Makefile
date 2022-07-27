@@ -1,3 +1,8 @@
+create_env:
+	python3 -m venv env
+	source env/bin/activate
+	pip install -r requirements.txt
+
 activate:
 	source env/bin/activate
 
