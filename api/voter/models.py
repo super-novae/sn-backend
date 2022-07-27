@@ -7,30 +7,39 @@ from secrets import token_urlsafe
 # Load environment variables
 load_dotenv()
 
+
 class Voter(db.Model):
     __tablename__ = "sn_voter"
 
     id = db.Column(db.String(length=32), nullable=False, unique=True, primary_key=True)
+    student_id = db.Column(db.String(length=8), nullable=False)
     name = db.Column(db.String(80), nullable=False)
     username = db.Column(db.String(15), nullable=False, unique=True)
     email = db.Column(db.String(80), nullable=False, unique=True)
+    telephone_number = db.Column(db.String(10), nullable=False, unique=True)
+    programme = db.Column(db.String(length=100), nullable=False)
+    year = db.Column(db.String(length=6), nullable=False)
     date_created = db.Column(db.DateTime(), nullable=False)
     password_hash = db.Column(db.String(length=130), nullable=False)
-    telephone_number = db.Column(db.String(10), nullable=False, unique=True)
-    organization_id = db.Column(db.String(length=32), db.ForeignKey("sn_organization.id"), nullable=False)
-    
-    def __init__(self, name, username, email, telephone_number, organization_id):
+    organization_id = db.Column(
+        db.String(length=32), db.ForeignKey("sn_organization.id"), nullable=False
+    )
+
+    def __init__(
+        self, name, username, email, telephone_number, organization_id, password
+    ):
         self.id = f"voter-{token_urlsafe()[:26]}"
         self.name = name
         self.username = username
         self.email = email
         self.telephone_number = telephone_number
         self.organization_id = organization_id
-    
+        self.date_created = datetime.today()
+
     @property
     def password():
         return "Password can only be set"
-    
+
     @property().setter
     def password(self, password):
         self.password_hash = bcrypt.generate_password_hash(
@@ -55,43 +64,68 @@ class Voter(db.Model):
     @classmethod
     def find_all_by_voter_group_id(cls):
         return cls.query.all()
-    
+
+    @classmethod
+    def find_all_organization_id(cls, organization_id):
+        return cls.query.filter_by(organization_id=organization_id).all()
+
 
 class VoterGroup(db.Model):
     __tablename__ = "sn_voter_group"
 
     id = db.Column(db.String(length=32), nullable=False, unique=True, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
-    organization_id = db.Column(db.String(length=32), db.ForeignKey("sn_organization.id"), nullable=False)
-    
+    organization_id = db.Column(
+        db.String(length=32), db.ForeignKey("sn_organization.id"), nullable=False
+    )
+
     def __init__(self, name, organization_id):
         self.id = f"vot-grp-{token_urlsafe()[:24]}"
         self.name = name
         self.organization_id = organization_id
-    
+
     @classmethod
     def find_all_voter_groups_by_organization_id(cls, organization_id):
         return cls.query.filter_by(organization_id=organization_id)
 
+
 class VoterGroupVoter(db.Model):
     __tablename__ = "sn_voter_group_voter"
-    
+
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    voter_id = db.Column(db.String(length=32), db.ForeignKey("sn_voter.id"), nullable=False)
-    voter_group_id = db.Column(db.String(length=32), db.ForeignKey("sn_voter_group.id"), nullable=False)
+    voter_id = db.Column(
+        db.String(length=32), db.ForeignKey("sn_voter.id"), nullable=False
+    )
+    voter_group_id = db.Column(
+        db.String(length=32), db.ForeignKey("sn_voter_group.id"), nullable=False
+    )
+
 
 class VoterGroupElection(db.Model):
     __tablename__ = "sn_voter_group_election"
-    
+
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    voter_group_id = db.Column(db.String(length=32), db.ForeignKey("sn_voter_group.id"), nullable=False)
-    election_id = db.Column(db.String(length=32), db.ForeignKey("sn_election.id"), nullable=False)
+    voter_group_id = db.Column(
+        db.String(length=32), db.ForeignKey("sn_voter_group.id"), nullable=False
+    )
+    election_id = db.Column(
+        db.String(length=32), db.ForeignKey("sn_election.id"), nullable=False
+    )
+
 
 class Votes(db.Model):
     __tablename__ = "sn_votes"
-    
+
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    voter_id = db.Column(db.String(length=32), db.ForeignKey("sn_voter.id"), nullable=False)
-    election_id = db.Column(db.String(length=32), db.ForeignKey("sn_election.id"), nullable=False)
-    candidate_id = db.Column(db.String(length=32), db.ForeignKey("sn_candidate.id"), nullable=False)
-    office_id = db.Column(db.String(length=32), db.ForeignKey("sn_office.id"), nullable=False)
+    voter_id = db.Column(
+        db.String(length=32), db.ForeignKey("sn_voter.id"), nullable=False
+    )
+    election_id = db.Column(
+        db.String(length=32), db.ForeignKey("sn_election.id"), nullable=False
+    )
+    candidate_id = db.Column(
+        db.String(length=32), db.ForeignKey("sn_candidate.id"), nullable=False
+    )
+    office_id = db.Column(
+        db.String(length=32), db.ForeignKey("sn_office.id"), nullable=False
+    )
