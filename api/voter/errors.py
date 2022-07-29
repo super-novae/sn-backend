@@ -14,3 +14,7 @@ class VoterAlreadyExists(HTTPError):
 class VoterOrganizationIdNotProvided(HTTPError):
     message: str = "No organization provided in the url"
     status_code: int = 400
+
+class VoterHasAlreadyVoted(HTTPError):
+    message: str = "Voter has alredy voted for a candidate in this officce"
+    status_code: int = 400

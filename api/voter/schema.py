@@ -1,6 +1,8 @@
 from apiflask import Schema
-from apiflask.fields import String, Email, Date, List, Nested
-from apiflask.validators import Length, OneOf
+from apiflask.fields import String, Integer, Email, Date, List, Nested
+from apiflask.validators import Length, OneOf, Regexp
+from api.generic.data import colleges
+from api.election.schema import ElectionSchema
 
 
 class VoterSchema(Schema):
@@ -10,6 +12,7 @@ class VoterSchema(Schema):
     username = String(required=True, validate=[Length(min=3, max=15)])
     email = Email(required=True)
     telephone = String(required=True, validate=[Length(equal=10)])
+    college = String(required=True, validate=[OneOf(colleges)])
     programme = String(required=True, validate=[Length(min=10, max=100)])
     year = String(
         required=True,
@@ -31,3 +34,16 @@ class VotersSchema(Schema):
 
 class VoterGetAllInputSchema(Schema):
     organization_id = String(required=True, validate=[Length(equal=32)])
+
+
+class VoterElections(Schema):
+    src_elections = List(Nested(ElectionSchema))
+    college_elections = List(Nested(ElectionSchema))
+    department_elections = List(Nested(ElectionSchema))
+
+class VoteSchema(Schema):
+    id = Integer(dump_only=True)
+    voter_id = String(required=True, validate=[Length(equal=32), Regexp("^voter-")])
+    election_id = String(required=True, validate=[Length(equal=32), Regexp("^elec-")])
+    candidate_id = String(validate=[Length(equal=32), Regexp("^cand-")])
+    office_id = String(required=True, validate=[Length(equal=32), Regexp("^off-")])

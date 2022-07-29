@@ -17,6 +17,7 @@ class Voter(db.Model):
     username = db.Column(db.String(15), nullable=False, unique=True)
     email = db.Column(db.String(80), nullable=False, unique=True)
     telephone_number = db.Column(db.String(10), nullable=False, unique=True)
+    college = db.Column(db.String(length=100), nullable=False)
     programme = db.Column(db.String(length=100), nullable=False)
     year = db.Column(db.String(length=6), nullable=False)
     date_created = db.Column(db.DateTime(), nullable=False)
@@ -69,16 +70,6 @@ class Voter(db.Model):
     def find_all_organization_id(cls, organization_id):
         return cls.query.filter_by(organization_id=organization_id).all()
 
-
-class VoterGroup(db.Model):
-    __tablename__ = "sn_voter_group"
-
-    id = db.Column(db.String(length=32), nullable=False, unique=True, primary_key=True)
-    name = db.Column(db.String(80), nullable=False)
-    organization_id = db.Column(
-        db.String(length=32), db.ForeignKey("sn_organization.id"), nullable=False
-    )
-
     def __init__(self, name, organization_id):
         self.id = f"vot-grp-{token_urlsafe()[:24]}"
         self.name = name
@@ -89,31 +80,7 @@ class VoterGroup(db.Model):
         return cls.query.filter_by(organization_id=organization_id)
 
 
-class VoterGroupVoter(db.Model):
-    __tablename__ = "sn_voter_group_voter"
-
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    voter_id = db.Column(
-        db.String(length=32), db.ForeignKey("sn_voter.id"), nullable=False
-    )
-    voter_group_id = db.Column(
-        db.String(length=32), db.ForeignKey("sn_voter_group.id"), nullable=False
-    )
-
-
-class VoterGroupElection(db.Model):
-    __tablename__ = "sn_voter_group_election"
-
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    voter_group_id = db.Column(
-        db.String(length=32), db.ForeignKey("sn_voter_group.id"), nullable=False
-    )
-    election_id = db.Column(
-        db.String(length=32), db.ForeignKey("sn_election.id"), nullable=False
-    )
-
-
-class Votes(db.Model):
+class Vote(db.Model):
     __tablename__ = "sn_votes"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -129,3 +96,18 @@ class Votes(db.Model):
     office_id = db.Column(
         db.String(length=32), db.ForeignKey("sn_office.id"), nullable=False
     )
+
+    # TODO: Check if voter has already using the voter id & office id 
+    @classmethod
+    def voter_vote_exists(cls, voter_id, office_id):
+        return cls.query.filter_by(voter_id=voter_id, office_id=office_id)
+    
+       
+    # TODO: Retrive all src votes (results)
+    # @classmethod
+    # def votes_get_src_results(cls):
+    #     return
+    
+    # TODO: Retrive college level vote (results)
+    # TODO: Retrieve all voter votes (results)
+

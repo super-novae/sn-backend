@@ -2,23 +2,25 @@ from .errors import (
     VoterDoesNotExist,
     VoterAlreadyExists,
     VoterOrganizationIdNotProvided,
+    VoterHasAlreadyVoted
 )
-from .models import Voter
-from .schema import VoterSchema, VotersSchema, VoterGetAllInputSchema
+from .models import Voter, Vote
+from .schema import VoterElections, VoterSchema, VotersSchema, VoterGetAllInputSchema
 from apiflask import APIBlueprint
-from api.extensions import db
-from api.generic.errors import UserDoesNotHaveRequiredRoles
+from api.election.models import Election
+from api.extensions import db, logger
+from api.generic.errors import UserDoesNotHaveRequiredRoles, InternalServerError
 from api.generic.methods import has_roles
+from api.generic.responses import GenericMessage
 from api.organization.errors import OrganizationNotFound
 from api.organization.models import Organization
 from flask import request
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 
+
+
 voters = APIBlueprint("voter", __name__, tag="Voter", url_prefix="/api/v1/voters")
 
-############################################
-##                 VOTER                  ##
-############################################
 @voters.post("/signup")
 @voters.input(VoterSchema)
 @voters.output(VoterSchema)
@@ -50,10 +52,33 @@ def voter_signup(data):
 
 
 @voters.post("/signup-bulk")
-@voters.doc()
-def voter_bulk_signup():
-    # TODO: Implement later
-    pass
+@voters.input(VotersSchema)
+@voters.output(GenericMessage)
+@voters.doc(
+    summary="Voter Signup (Bulk)",
+    description="An endpoint for bulk voter signup",
+    responses=[201, 403]
+)
+def voter_bulk_signup(data):
+    user_has_required_roles = has_roles(["admin"], get_jwt_identity())
+    if not user_has_required_roles:
+        raise UserDoesNotHaveRequiredRoles
+    
+    total_number_of_voters = len(data["voters"])
+    
+    try:
+        for _ in range(total_number_of_voters):
+            voter = Voter(**data)
+            db.session.add(voter)
+            db.session.flush()
+        
+        db.session.commit()
+        
+        return {"message": f"{total_number_of_voters} voters created successfully"}
+    
+    except Exception as e:
+        logger.info(e)
+        raise InternalServerError
 
 
 @voters.post("/login")
@@ -108,6 +133,7 @@ def voter_get_by_id(voter_id):
     description="An endpoint to get all voters in organization",
     responses=[200, 400, 403],
 )
+@jwt_required()
 def voter_get_all():
     # Perform security checks
     user_has_required_roles = has_roles(["admin", "voter"], get_jwt_identity())
@@ -126,25 +152,55 @@ def voter_get_all():
     raise VoterOrganizationIdNotProvided
 
 
-@voters.get("/<id>/elections")
+@voters.get("/<voter_id>/elections")
+@voters.output(VoterElections)
 @voters.doc(
     summary="Voter Elections",
     description="An endpoint to get all mini elections for voter",
+    responses=[200,403]
 )
-def voter_get_elections(id, data):
-    pass #TODO: Continue from here tomorrow
+@jwt_required()
+def voter_get_elections(voter_id):
+    # Perform security checks
+    user_has_required_roles = has_roles(["voter"], get_jwt_identity())
+    if not user_has_required_roles:
+        raise UserDoesNotHaveRequiredRoles
+
+    voter: Voter = Voter.find_by_id(voter_id)
+    src_elections = Election.find_by_type("SRC")
+    college_elections = Election.find_by_college(voter.college)
+    department_elections = Election.find_by_programme(voter.programme)
+
+    return {
+        "src_elections": src_elections,
+        "college_elections": college_elections,
+        "department_elections": department_elections,
+    }, 200
 
 
-@voters.post("/")
+@voters.post("/<voter_id>/vote")
 @voters.doc(
     summary="Voter Cast Vote",
     description="An endpoint for the voter to cast his vote in a mini election",
+    responses=[201, 400, 403]
 )
-def voter_cast_vote():
-    # Check if user has the right priveleges
-    # Check if voter has already voted
-    pass
-
+@jwt_required()
+def voter_cast_vote(voter_id, data):
+    user_has_required_roles = has_roles(["voter"], get_jwt_identity())
+    if not user_has_required_roles:
+        raise UserDoesNotHaveRequiredRoles
+    
+    voter_has_already_voted = Vote.voter_vote_exists(data["voter_id"], data["office_id"])
+    if voter_has_already_voted:
+        raise VoterHasAlreadyVoted
+    
+    vote = Vote(**data)
+    
+    db.session.add(vote)
+    db.session.commit()
+    
+    return vote, 201
+    
 
 @voters.post("/logout")
 @voters.doc(summary="Voter Logout", description="An endpoint for the voter to logout")
@@ -152,48 +208,13 @@ def voter_logout():
     pass
 
 
-############################################
-##                 VOTER GROUP            ##
-############################################
-@voters.post("/groups")
-@voters.doc(
-    summary="Create Voter Group",
-    description="An endpoint for the administrator to create a voter group",
-)
-def voter_group_create():
-    pass
+@voters.get("/test-signal")
+def voter_test_signal():
+    try:
+        lists = [[1,2], [3,4]]
+        lists[2]
+    except Exception as e:
+        logger.info(e)
+        raise InternalServerError
 
-
-@voters.get("/groups")
-@voters.doc(
-    summary="Get Voter Group By Id",
-    description="An endpoint to get the voter group by ID",
-)
-def voter_group_get_by_id():
-    pass
-
-
-@voters.get("/groups/all")
-@voters.doc(
-    summary="Get All Voter Groups", description="An endpoint to get all voter groups "
-)
-def voter_group_get_all():
-    pass
-
-
-@voters.delete("/groups")
-@voters.doc(
-    summary="Delete Voter Group",
-    description="An endpoint for the administrator to delete a voter group",
-)
-def voter_group_delete():
-    pass
-
-
-@voters.put("/groups")
-@voters.doc(
-    summary="Modify Voter Group",
-    description="An endpoint for the administrator to modify a voter group",
-)
-def voter_group_modify():
-    pass
+#TODO: [Future] Update Bulk Student Data
