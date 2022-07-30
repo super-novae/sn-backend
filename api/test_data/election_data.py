@@ -85,5 +85,5 @@ def candidate_create() -> Candidate:
     return candidate
 
 
-def candidate_get_test_instance(id) -> Candidate:
-    return Candidate.find_candidate_by_id(id)
+def candidate_get_test_instance(id=None) -> Candidate:
+    return Candidate.query.filter_by(programme="Bsc. Computer Engineering").first()

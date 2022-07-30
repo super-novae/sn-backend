@@ -27,15 +27,38 @@ class Voter(db.Model):
     )
 
     def __init__(
-        self, name, username, email, telephone_number, organization_id, password
+        self,
+        student_id: str,
+        name: str,
+        email: str,
+        telephone_number: str,
+        college: str,
+        programme: str,
+        year: str,
+        organization_id: str,
+        password: str = None,
     ):
         self.id = f"voter-{token_urlsafe()[:26]}"
+        self.student_id = student_id
         self.name = name
-        self.username = username
         self.email = email
         self.telephone_number = telephone_number
+        self.college = college
+        self.programme = programme
+        self.year = year
         self.organization_id = organization_id
         self.date_created = datetime.today()
+
+        splitted_name: str = name.lower().split(" ")
+
+        if len(splitted_name) > 1:
+            self.username = (
+                splitted_name[1][0] + splitted_name[0][:9] + "-" + token_urlsafe()[:4]
+            )
+        else:
+            self.username = (
+                splitted_name[1][0] + splitted_name[0][:9] + "-" + token_urlsafe()[:4]
+            )
 
     @property
     def password():
@@ -87,7 +110,7 @@ class Vote(db.Model):
     # TODO: Check if voter has already using the voter id & office id
     @classmethod
     def voter_vote_exists(cls, voter_id, office_id):
-        return cls.query.filter_by(voter_id=voter_id, office_id=office_id)
+        return cls.query.filter_by(voter_id=voter_id, office_id=office_id).first()
 
     # TODO: Retrive all src votes (results)
     # @classmethod

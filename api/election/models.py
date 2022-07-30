@@ -32,15 +32,15 @@ class Election(db.Model):
 
     @classmethod
     def find_by_type(cls, type):
-        return cls.query.filter_by(type=type).first()
+        return cls.query.filter_by(type=type).all()
 
     @classmethod
     def find_by_college(cls, college):
-        return cls.query.filter_by(college=college).first()
+        return cls.query.filter_by(college=college).all()
 
     @classmethod
     def find_by_programme(cls, programme):
-        return cls.query.filter_by(programme=programme).first()
+        return cls.query.filter_by(programme=programme).all()
 
     @classmethod
     def find_all_elections_by_organization_id(cls, organization_id):
