@@ -12,7 +12,7 @@ from .schema import (
     VoterSchema,
     VotersSchema,
     VoterGetAllInputSchema,
-    VoteSchema
+    VoteSchema,
 )
 from apiflask import APIBlueprint
 from api.election.models import Election

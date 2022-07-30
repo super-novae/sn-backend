@@ -1,7 +1,11 @@
 from api.extensions import fake, db
 from api.voter.models import Voter, Vote
 from api.generic.data import colleges, colleges_programmes, years
-from api.test_data.election_data import candidate_get_test_instance, election_get_test_instance, office_get_test_instance
+from api.test_data.election_data import (
+    candidate_get_test_instance,
+    election_get_test_instance,
+    office_get_test_instance,
+)
 from api.test_data.organization_data import organization_get_test_instance
 from random import randint, choice
 
@@ -64,19 +68,21 @@ def voter_login(client, seed):
 
     return response.json
 
+
 def voter_vote_details(seed):
     vote = {
         "voter_id": voter_get_test_instance(seed).id,
         "election_id": election_get_test_instance().id,
         "candidate_id": candidate_get_test_instance().id,
-        "office_id": office_get_test_instance().id
+        "office_id": office_get_test_instance().id,
     }
 
     return vote
 
+
 def voter_create_vote(seed):
     data = voter_vote_details(seed)
-    
+
     vote = Vote(**data)
 
     db.session.add(vote)

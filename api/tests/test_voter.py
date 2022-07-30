@@ -467,7 +467,7 @@ def test_voter_cast_vote_successful(client):
     )
 
     assert response.status_code == 201
-    assert response.json['id']
+    assert response.json["id"]
 
 
 def test_voter_cast_vote_unauthorized(client):
@@ -500,7 +500,7 @@ def test_voter_cast_vote_unauthorized(client):
         response.json["message"]
         == "User does not have the required permissions to perform action"
     )
-    
+
 
 def test_voter_cast_vote_voter_has_already_cast_vote(client):
     # Clear database before tests
@@ -529,4 +529,7 @@ def test_voter_cast_vote_voter_has_already_cast_vote(client):
     )
 
     assert response.status_code == 400
-    assert response.json['message'] == "Voter has already voted for a candidate in this office"
+    assert (
+        response.json["message"]
+        == "Voter has already voted for a candidate in this office"
+    )
