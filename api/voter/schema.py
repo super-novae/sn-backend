@@ -3,7 +3,7 @@ from apiflask.fields import String, Integer, Email, Date, List, Nested
 from apiflask.validators import Length, OneOf, Regexp
 from api.generic.data import colleges
 from api.election.schema import ElectionSchema
-
+from api.generic.data import programmes
 
 class VoterSchema(Schema):
     id = String(required=True, dump_only=True)
@@ -13,7 +13,7 @@ class VoterSchema(Schema):
     email = Email(required=True)
     telephone = String(required=True, validate=[Length(equal=10)])
     college = String(required=True, validate=[OneOf(colleges)])
-    programme = String(required=True, validate=[Length(min=10, max=100)])
+    programme = String(required=False, validate=[OneOf(programmes)])
     year = String(
         required=True,
         validate=[
@@ -31,6 +31,9 @@ class VoterSchema(Schema):
 class VotersSchema(Schema):
     voters = List(Nested(VoterSchema))
 
+class VoterLoginInputSchema(Schema):
+    email = Email(required=True)
+    password = String(required=True)
 
 class VoterGetAllInputSchema(Schema):
     organization_id = String(required=True, validate=[Length(equal=32)])

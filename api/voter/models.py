@@ -63,25 +63,12 @@ class Voter(db.Model):
         return cls.query.filter_by(email=email).first()
 
     @classmethod
-    def find_all_by_voter_group_id(cls):
-        return cls.query.all()
-
-    @classmethod
     def find_all_organization_id(cls, organization_id):
         return cls.query.filter_by(organization_id=organization_id).all()
 
-    def __init__(self, name, organization_id):
-        self.id = f"vot-grp-{token_urlsafe()[:24]}"
-        self.name = name
-        self.organization_id = organization_id
-
-    @classmethod
-    def find_all_voter_groups_by_organization_id(cls, organization_id):
-        return cls.query.filter_by(organization_id=organization_id)
-
 
 class Vote(db.Model):
-    __tablename__ = "sn_votes"
+    __tablename__ = "sn_vote"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     voter_id = db.Column(

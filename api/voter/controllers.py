@@ -5,7 +5,13 @@ from .errors import (
     VoterHasAlreadyVoted
 )
 from .models import Voter, Vote
-from .schema import VoterElections, VoterSchema, VotersSchema, VoterGetAllInputSchema
+from .schema import (
+    VoterElections, 
+    VoterLoginInputSchema,
+    VoterSchema, 
+    VotersSchema, 
+    VoterGetAllInputSchema
+)
 from apiflask import APIBlueprint
 from api.election.models import Election
 from api.extensions import db, logger
@@ -16,8 +22,6 @@ from api.organization.errors import OrganizationNotFound
 from api.organization.models import Organization
 from flask import request
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
-
-
 
 voters = APIBlueprint("voter", __name__, tag="Voter", url_prefix="/api/v1/voters")
 
@@ -82,7 +86,7 @@ def voter_bulk_signup(data):
 
 
 @voters.post("/login")
-@voters.input(VoterSchema)
+@voters.input(VoterLoginInputSchema)
 @voters.output(VoterSchema)
 @voters.doc(
     summary="Voter Login",
@@ -207,7 +211,7 @@ def voter_cast_vote(voter_id, data):
 def voter_logout():
     pass
 
-
+# TODO: Remove this endpoint(Testing)
 @voters.get("/test-signal")
 def voter_test_signal():
     try:
