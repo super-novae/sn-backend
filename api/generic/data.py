@@ -97,3 +97,5 @@ programmes = []
 
 for key, value in colleges_programmes.items():
     programmes += value
+
+years = ["Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"]
