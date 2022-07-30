@@ -1,5 +1,4 @@
 from datetime import datetime
-from posixpath import split
 from api.extensions import db, bcrypt
 from os import environ
 from dotenv import load_dotenv

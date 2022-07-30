@@ -22,7 +22,6 @@ from api.generic.methods import has_roles
 from api.generic.responses import GenericMessage
 from api.organization.errors import OrganizationNotFound
 from api.organization.models import Organization
-from flask import request
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 
 voters = APIBlueprint("voter", __name__, tag="Voter", url_prefix="/api/v1/voters")

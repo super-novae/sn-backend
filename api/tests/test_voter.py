@@ -1,5 +1,3 @@
-from importlib.util import resolve_name
-from urllib import response
 from api.test_data.admin_data import administrator_signup, administrator_login
 from api.test_data.election_data import candidate_create, election_create, office_create
 from api.test_data.organization_data import organization_create
