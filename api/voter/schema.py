@@ -5,6 +5,7 @@ from api.generic.data import colleges
 from api.election.schema import ElectionSchema
 from api.generic.data import programmes
 
+
 class VoterSchema(Schema):
     id = String(required=True, dump_only=True)
     student_id = String(required=True, validate=[Length(8)])
@@ -31,9 +32,11 @@ class VoterSchema(Schema):
 class VotersSchema(Schema):
     voters = List(Nested(VoterSchema))
 
+
 class VoterLoginInputSchema(Schema):
     email = Email(required=True)
     password = String(required=True)
+
 
 class VoterGetAllInputSchema(Schema):
     organization_id = String(required=True, validate=[Length(equal=32)])
@@ -43,6 +46,7 @@ class VoterElections(Schema):
     src_elections = List(Nested(ElectionSchema))
     college_elections = List(Nested(ElectionSchema))
     department_elections = List(Nested(ElectionSchema))
+
 
 class VoteSchema(Schema):
     id = Integer(dump_only=True)

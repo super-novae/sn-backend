@@ -84,17 +84,15 @@ class Vote(db.Model):
         db.String(length=32), db.ForeignKey("sn_office.id"), nullable=False
     )
 
-    # TODO: Check if voter has already using the voter id & office id 
+    # TODO: Check if voter has already using the voter id & office id
     @classmethod
     def voter_vote_exists(cls, voter_id, office_id):
         return cls.query.filter_by(voter_id=voter_id, office_id=office_id)
-    
-       
+
     # TODO: Retrive all src votes (results)
     # @classmethod
     # def votes_get_src_results(cls):
     #     return
-    
+
     # TODO: Retrive college level vote (results)
     # TODO: Retrieve all voter votes (results)
-

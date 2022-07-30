@@ -53,4 +53,3 @@ class CandidateSchema(Schema):
 
 class CandidatesSchema(Schema):
     candidates = List(Nested(CandidateSchema))
-
