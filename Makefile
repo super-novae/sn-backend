@@ -1,8 +1,19 @@
+create_env:
+	python3 -m venv env
+	source env/bin/activate
+	pip install -r requirements.txt
+
+check_coverage:
+	pytest --cov-config=.coveragerc --cov-report term-missing --cov=api --cov-fail-under=80
+
 activate:
 	source env/bin/activate
 
 run:
-	flask run
+	flask run --reload
+
+grun:
+	gunicorn run:app
 
 migrate:
 	flask db migrate

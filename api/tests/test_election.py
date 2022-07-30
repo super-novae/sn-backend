@@ -356,6 +356,7 @@ def test_election_get_all_by_organization_id_unauthorized(client):
     # Clear database after tests
     truncate_db_tables()
 
+
 def test_office_create_successful(client):
     # Clear database before tests
     truncate_db_tables()
@@ -365,19 +366,19 @@ def test_office_create_successful(client):
     administrator_signup(client)
     organization_create()
     election = election_create()
-    
+
     administrator = administrator_login(client)
 
-    
     response = client.post(
         f"/api/v1/elections/{election.id}/office/",
         json=office_details(),
-        headers={"Authorization": f"Bearer {administrator['auth_token']}"}
+        headers={"Authorization": f"Bearer {administrator['auth_token']}"},
     )
-    
+
     assert response.status_code == 201
     assert response.json["election_id"] == election.id
     assert len(response.json) == 4
+
 
 def test_create_office_unauthorized(client):
     # Clear database before tests
@@ -388,22 +389,22 @@ def test_create_office_unauthorized(client):
     administrator_signup(client)
     organization_create()
     election = election_create()
-    
+
     superuser = superuser_login(client)
 
-    
     response = client.post(
         f"/api/v1/elections/{election.id}/office/",
         json=office_details(),
-        headers={"Authorization": f"Bearer {superuser['auth_token']}"}
+        headers={"Authorization": f"Bearer {superuser['auth_token']}"},
     )
-    
+
     assert response.status_code == 403
     assert (
         response.json["message"]
         == "User does not have the required permissions to perform action"
-    )    
-    
+    )
+
+
 def test_modify_office_successful(client):
     # Clear database before tests
     truncate_db_tables()
@@ -414,19 +415,20 @@ def test_modify_office_successful(client):
     organization_create()
     election = election_create()
     office = office_create()
-    
+
     administrator = administrator_login(client)
-    
+
     response = client.put(
         f"/api/v1/elections/{election.id}/office/{office.id}",
         json=office_modified_details(),
-        headers={"Authorization": f"Bearer {administrator['auth_token']}"}
+        headers={"Authorization": f"Bearer {administrator['auth_token']}"},
     )
-    
+
     assert response.status_code == 200
     assert response.json["message"] == "Office modified successfully"
     assert office.route_name == office_modified_details()["route_name"]
-    
+
+
 def test_modify_office_unauthorized(client):
     # Clear database before tests
     truncate_db_tables()
@@ -437,22 +439,22 @@ def test_modify_office_unauthorized(client):
     organization_create()
     election = election_create()
     office = office_create()
-    
+
     superuser = superuser_login(client)
-    
+
     response = client.put(
         f"/api/v1/elections/{election.id}/office/{office.id}",
         json=office_modified_details(),
-        headers={"Authorization": f"Bearer {superuser['auth_token']}"}
+        headers={"Authorization": f"Bearer {superuser['auth_token']}"},
     )
-    
+
     assert response.status_code == 403
     assert (
         response.json["message"]
         == "User does not have the required permissions to perform action"
-    )  
-    
-    
+    )
+
+
 def test_modify_office_not_found(client):
     # Clear database before tests
     truncate_db_tables()
@@ -463,18 +465,19 @@ def test_modify_office_not_found(client):
     organization_create()
     election = election_create()
     office = office_create()
-    
+
     administrator = administrator_login(client)
-    
+
     response = client.put(
         f"/api/v1/elections/{election.id}/office/{office.id[:4] + office.id[4:][::-1]}",
         json=office_modified_details(),
-        headers={"Authorization": f"Bearer {administrator['auth_token']}"}
+        headers={"Authorization": f"Bearer {administrator['auth_token']}"},
     )
-    
+
     assert response.status_code == 404
     assert response.json["message"] == "An office with the given ID does not exist"
-    
+
+
 def test_delete_office_successful(client):
     # Clear database before tests
     truncate_db_tables()
@@ -485,18 +488,18 @@ def test_delete_office_successful(client):
     organization_create()
     election = election_create()
     office = office_create()
-    
+
     administrator = administrator_login(client)
-    
+
     response = client.delete(
         f"/api/v1/elections/{election.id}/office/{office.id}",
-        headers={"Authorization": f"Bearer {administrator['auth_token']}"}
+        headers={"Authorization": f"Bearer {administrator['auth_token']}"},
     )
-    
+
     assert response.status_code == 200
-    assert response.json["message"] == 'Office deleted successfully'
-    
-    
+    assert response.json["message"] == "Office deleted successfully"
+
+
 def test_delete_office_unauthorized(client):
     # Clear database before tests
     truncate_db_tables()
@@ -507,20 +510,21 @@ def test_delete_office_unauthorized(client):
     organization_create()
     election = election_create()
     office = office_create()
-    
+
     superuser = superuser_login(client)
-    
+
     response = client.delete(
         f"/api/v1/elections/{election.id}/office/{office.id}",
-        headers={"Authorization": f"Bearer {superuser['auth_token']}"}
+        headers={"Authorization": f"Bearer {superuser['auth_token']}"},
     )
-    
+
     assert response.status_code == 403
     assert (
         response.json["message"]
         == "User does not have the required permissions to perform action"
-    )  
-    
+    )
+
+
 def test_delete_office_not_found(client):
     # Clear database before tests
     truncate_db_tables()
@@ -531,16 +535,16 @@ def test_delete_office_not_found(client):
     organization_create()
     election = election_create()
     office = office_create()
-    
+
     administrator = administrator_login(client)
-    
+
     response = client.delete(
         f"/api/v1/elections/{election.id}/office/{office.id[:4] + office.id[4:][::-1]}",
-        headers={"Authorization": f"Bearer {administrator['auth_token']}"}
+        headers={"Authorization": f"Bearer {administrator['auth_token']}"},
     )
-    
+
     assert response.status_code == 404
-    assert response.json["message"] == "An office with the given ID does not exist"    
+    assert response.json["message"] == "An office with the given ID does not exist"
 
 
 def test_election_create_candidate_successful(client):
@@ -902,6 +906,6 @@ def test_election_get_all_candidates_by_election_id_unauthorized(client):
         response.json["message"]
         == "User does not have the required permissions to perform action"
     )
-    
+
     # Clear database after tests
     truncate_db_tables()

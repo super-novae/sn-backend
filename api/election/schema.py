@@ -1,12 +1,19 @@
 from apiflask import Schema
 from apiflask.fields import String, List, Nested
-from apiflask.validators import Length, Regexp, URL
+from apiflask.validators import Length, Regexp, URL, OneOf
+from api.generic.data import types, colleges, programmes
 
 
 class ElectionSchema(Schema):
+    id = String(required=True, dump_only=True)
     name = String(validate=[Length(5, 100)], required=True)
-    organization_id = String(required=True, validate=[Regexp("^org-"), Length(equal=32)])
+    organization_id = String(
+        required=True, validate=[Regexp("^org-"), Length(equal=32)]
+    )
     route_name = String(required=True, validate=[Length(min=4, max=50)])
+    type = String(required=True, validate=[OneOf(types)])
+    college = String(required=False, validate=[OneOf(colleges)])
+    programme = String(required=False, validate=[OneOf(programmes)])
 
 
 class ElectionsSchema(Schema):
@@ -27,12 +34,12 @@ class OfficeSchema(Schema):
 
 class OfficesSchema(Schema):
     offices = List(Nested(OfficeSchema))
-    
+
 
 class OfficeUpdateSchema(Schema):
     name = String(required=True)
     route_name = String(required=True, validate=[Length(min=4, max=50)])
-    
+
 
 class CandidateSchema(Schema):
     name = String(validate=[Length(5, 80)], required=True)
