@@ -10,7 +10,7 @@ activate:
 	source env/bin/activate
 
 run:
-	flask run
+	flask run --reload
 
 grun:
 	gunicorn run:app
