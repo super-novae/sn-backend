@@ -67,7 +67,7 @@ class Office(db.Model):
 
     @classmethod
     def find_all_by_election_id(cls, election_id):
-        return cls.query.filter_by(election_id=election_id)
+        return cls.query.filter_by(election_id=election_id).all()
 
 
 class Candidate(db.Model):
@@ -103,3 +103,7 @@ class Candidate(db.Model):
     @classmethod
     def find_all_candidates_by_election_id(cls, election_id):
         return cls.query.filter_by(election_id=election_id).all()
+
+    @classmethod
+    def find_all_candidates_by_office_id(cls, office_id):
+        return cls.query.filter_by(office_id=office_id).all()

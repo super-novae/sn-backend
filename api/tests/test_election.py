@@ -1,3 +1,4 @@
+from xmlrpc.client import ResponseError
 from .setup import truncate_db_tables
 from ..election.models import Election
 from ..test_data.superuser_data import superuser_create, superuser_login
@@ -18,6 +19,8 @@ from ..test_data.election_data import (
     office_details,
     office_modified_details,
 )
+from ..test_data.voter_data import voter_create, voter_login
+from random import randint
 
 
 def test_election_create_successful(client):
@@ -304,6 +307,91 @@ def test_election_get_by_id_non_existent(client):
 
     # Clear database after tests
     truncate_db_tables()
+
+
+def test_election_get_by_id_full_details_successful(client):
+    # Clear database before tests
+    truncate_db_tables()
+
+    # Create seed to generate the same data
+    seed = randint(1, 200)
+
+    superuser_create()
+    administrator_signup(client)
+    organization = organization_create()
+    election = election_create()
+    office_create()
+    candidate = candidate_create()
+    voter_create(seed)
+
+    voter = voter_login(client, seed)
+
+    response = client.get(
+        f"api/v1/elections/{election.id}/full_details",
+        headers={"Authorization": f"Bearer {voter['auth_token']}"},
+    )
+
+    assert response.status_code == 200
+    assert response.json["election"]
+    assert response.json["offices"]
+
+    # Clear database before tests
+    truncate_db_tables()
+
+
+def test_election_get_by_id_full_details_unauthorized(client):
+    # Clear database before tests
+    truncate_db_tables()
+
+    # Create seed to generate the same data
+    seed = randint(1, 200)
+
+    superuser_create()
+    administrator_signup(client)
+    organization = organization_create()
+    election = election_create()
+    office_create()
+    candidate = candidate_create()
+    voter_create(seed)
+
+    superuser = superuser_login(client)
+
+    response = client.get(
+        f"api/v1/elections/{election.id}/full_details",
+        headers={"Authorization": f"Bearer {superuser['auth_token']}"},
+    )
+
+    assert response.status_code == 403
+    assert (
+        response.json["message"]
+        == "User does not have the required permissions to perform action"
+    )
+
+
+def test_election_get_by_id_full_details_does_not_exist(client):
+    # Clear database before tests
+    truncate_db_tables()
+
+    # Create seed to generate the same data
+    seed = randint(1, 200)
+
+    superuser_create()
+    administrator_signup(client)
+    organization = organization_create()
+    election = election_create()
+    office_create()
+    candidate = candidate_create()
+    voter_create(seed)
+
+    voter = voter_login(client, seed)
+
+    response = client.get(
+        f"api/v1/elections/elec-{election.id[5:][::-1]}/full_details",
+        headers={"Authorization": f"Bearer {voter['auth_token']}"},
+    )
+
+    assert response.status_code == 404
+    assert response.json["message"] == "An election with the given ID does not exist"
 
 
 def test_election_get_all_by_organization_id_successful(client):
