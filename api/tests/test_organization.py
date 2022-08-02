@@ -27,6 +27,9 @@ def test_organization_create_successful(client):
     assert response.status_code == 200
     assert response.json["id"][:4] == "org-"
 
+    # Clear database after tests
+    truncate_db_tables()
+
 
 def test_organization_create_not_authorized(client):
     # Remove all data from database
@@ -48,6 +51,9 @@ def test_organization_create_not_authorized(client):
         response.json["message"]
         == "User does not have the required permissions to perform action"
     )
+
+    # Clear database after tests
+    truncate_db_tables()
 
 
 def test_organization_modify_by_id_successful(client):
@@ -73,6 +79,9 @@ def test_organization_modify_by_id_successful(client):
     assert response.json["id"] == modified_organization.id
     assert organization_name != modified_organization.name
 
+    # Clear database after tests
+    truncate_db_tables()
+
 
 def test_organization_modify_by_id_non_existent(client):
     # Remove all data from database
@@ -92,6 +101,9 @@ def test_organization_modify_by_id_non_existent(client):
 
     assert response.status_code == 404
     assert response.json["message"] == "Organization with the given ID does not exists"
+
+    # Clear database after tests
+    truncate_db_tables()
 
 
 def test_organization_modify_by_id_not_authorized(client):
@@ -115,6 +127,9 @@ def test_organization_modify_by_id_not_authorized(client):
         response.json["message"]
         == "User does not have the required permissions to perform action"
     )
+
+    # Clear database after tests
+    truncate_db_tables()
 
 
 def test_organization_delete_by_id_successful(client):
@@ -142,6 +157,9 @@ def test_organization_delete_by_id_successful(client):
     )
     assert deleted_organization == None
 
+    # Clear database after tests
+    truncate_db_tables()
+
 
 def test_organization_delete_by_id_non_existent(client):
     # Remove all data from database
@@ -161,6 +179,9 @@ def test_organization_delete_by_id_non_existent(client):
 
     assert response.status_code == 404
     assert response.json["message"] == "Organization with the given ID does not exists"
+
+    # Clear database after tests
+    truncate_db_tables()
 
 
 def test_organization_delete_by_id_not_authorized(client):
@@ -184,3 +205,6 @@ def test_organization_delete_by_id_not_authorized(client):
         response.json["message"]
         == "User does not have the required permissions to perform action"
     )
+
+    # Clear database after tests
+    truncate_db_tables()

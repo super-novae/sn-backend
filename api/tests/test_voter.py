@@ -41,6 +41,9 @@ def test_voter_signup_successful(client):
     assert response.json["email"] == created_voter.email
     assert response.json["id"] == created_voter.id
 
+    # Clear database after tests
+    truncate_db_tables()
+
 
 def test_voter_signup_voter_already_exists(client):
     # Clear database before tests
@@ -68,6 +71,9 @@ def test_voter_signup_voter_already_exists(client):
         response.json["message"] == "A voter with the given credentials already exists"
     )
 
+    # Clear database after tests
+    truncate_db_tables()
+
 
 def test_voter_signup_unauthorized(client):
     # Clear database before tests
@@ -93,6 +99,9 @@ def test_voter_signup_unauthorized(client):
         response.json["message"]
         == "User does not have the required permissions to perform action"
     )
+
+    # Clear database after tests
+    truncate_db_tables()
 
 
 def test_voter_bulk_signup_successful(client):
@@ -120,6 +129,9 @@ def test_voter_bulk_signup_successful(client):
     assert response.json["message"] == "5 voters created successfully"
     assert len(created_voters) == 5
 
+    # Clear database after tests
+    truncate_db_tables()
+
 
 def test_voter_bulk_signup_unauthorized(client):
     # Clear database before tests
@@ -146,6 +158,9 @@ def test_voter_bulk_signup_unauthorized(client):
         == "User does not have the required permissions to perform action"
     )
 
+    # Clear database after tests
+    truncate_db_tables()
+
 
 def test_voter_bulk_signup_server_error(client):
     pass  # TODO: Come back to this when i find a way to get 500
@@ -171,6 +186,9 @@ def test_voter_login_successful(client):
     assert response.json["id"] == voter.id
     assert response.json["auth_token"]
 
+    # Clear database after tests
+    truncate_db_tables()
+
 
 def test_voter_login_voter_does_not_exist(client):
     # Clear database before tests
@@ -194,6 +212,9 @@ def test_voter_login_voter_does_not_exist(client):
     assert (
         response.json["message"] == "A voter with the given credentials does not exist"
     )
+
+    # Clear database after tests
+    truncate_db_tables()
 
 
 def test_voter_get_by_id_successful(client):
@@ -221,6 +242,9 @@ def test_voter_get_by_id_successful(client):
     # TODO: Add some more assertions
     assert response.status_code == 200
 
+    # Clear database after tests
+    truncate_db_tables()
+
 
 def test_voter_get_by_id_voter_does_not_exist(client):
     # Clear database before tests
@@ -246,6 +270,9 @@ def test_voter_get_by_id_voter_does_not_exist(client):
 
     assert response.status_code == 404
     assert response.json["message"] == "A voter with the given Id does not exist"
+
+    # Clear database after tests
+    truncate_db_tables()
 
 
 def test_voter_get_by_id_unauthorized(client):
@@ -276,6 +303,9 @@ def test_voter_get_by_id_unauthorized(client):
         == "User does not have the required permissions to perform action"
     )
 
+    # Clear database after tests
+    truncate_db_tables()
+
 
 def test_voter_get_all_successful(client):
     # Clear database before tests
@@ -302,6 +332,9 @@ def test_voter_get_all_successful(client):
     assert response.status_code == 200
     assert response.json["voters"]
     assert len(response.json["voters"])
+
+    # Clear database after tests
+    truncate_db_tables()
 
 
 def test_voter_get_all_unauthorized(client):
@@ -332,6 +365,9 @@ def test_voter_get_all_unauthorized(client):
         == "User does not have the required permissions to perform action"
     )
 
+    # Clear database after tests
+    truncate_db_tables()
+
 
 def test_voter_get_all_organization_not_found(client):
     # Clear database before tests
@@ -358,6 +394,9 @@ def test_voter_get_all_organization_not_found(client):
     assert response.status_code == 404
     assert response.json["message"] == "Organization with the given ID does not exists"
 
+    # Clear database after tests
+    truncate_db_tables()
+
 
 def test_voter_get_all_organization_id_not_provided(client):
     # Clear database before tests
@@ -382,6 +421,9 @@ def test_voter_get_all_organization_id_not_provided(client):
 
     assert response.status_code == 400
     assert response.json["message"] == "Validation error"
+
+    # Clear database after tests
+    truncate_db_tables()
 
 
 def test_voter_get_elections_successful(client):
@@ -409,6 +451,9 @@ def test_voter_get_elections_successful(client):
     assert response.json["college_elections"] == []
     assert response.json["department_elections"] == []
     assert response.json["src_elections"]
+
+    # Clear database after tests
+    truncate_db_tables()
 
 
 def test_voter_get_elections_unauthorized(client):
@@ -439,6 +484,9 @@ def test_voter_get_elections_unauthorized(client):
         == "User does not have the required permissions to perform action"
     )
 
+    # Clear database after tests
+    truncate_db_tables()
+
 
 def test_voter_cast_vote_successful(client):
     # Clear database before tests
@@ -466,6 +514,9 @@ def test_voter_cast_vote_successful(client):
 
     assert response.status_code == 201
     assert response.json["id"]
+
+    # Clear database after tests
+    truncate_db_tables()
 
 
 def test_voter_cast_vote_unauthorized(client):
@@ -499,6 +550,9 @@ def test_voter_cast_vote_unauthorized(client):
         == "User does not have the required permissions to perform action"
     )
 
+    # Clear database after tests
+    truncate_db_tables()
+
 
 def test_voter_cast_vote_voter_has_already_cast_vote(client):
     # Clear database before tests
@@ -531,3 +585,6 @@ def test_voter_cast_vote_voter_has_already_cast_vote(client):
         response.json["message"]
         == "Voter has already voted for a candidate in this office"
     )
+
+    # Clear database after tests
+    truncate_db_tables()
