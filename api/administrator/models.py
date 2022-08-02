@@ -25,9 +25,9 @@ class Administrator(db.Model):
         self.email = email
         self.date_created = datetime.today()
 
-    @property
-    def password():
-        return "Password can only be set"
+    # @property
+    # def password():
+    #     return "Password can only be set"
 
     @property().setter
     def password(self, password):
