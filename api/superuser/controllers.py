@@ -1,8 +1,9 @@
 from apiflask import APIBlueprint
 from flask_jwt_extended import create_access_token
-from .errors import *
+from .errors import SuperuserWithCredentialsDoesNotExist
 from .models import Superuser
-from .schema import *
+from .schema import SuperuserLoginSchema, SuperUserSchema
+from api.extensions import logger
 
 # Initiate Super User module blueprint
 superuser = APIBlueprint(
@@ -26,4 +27,5 @@ def superuser_login(data):
         if superuser_password_is_correct:
             superuser.auth_token = create_access_token(superuser.id)
             return superuser
+    logger.warning("Wrong superuser login credentials provided")
     raise SuperuserWithCredentialsDoesNotExist
