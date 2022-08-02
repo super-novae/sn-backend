@@ -270,7 +270,7 @@ def election_get_office_by_id(election_id, office_id):
     return office, 200
 
 
-@election.post("/<election_id>/office/")
+@election.get("/<election_id>/office/")
 @election.output(OfficesSchema)
 @election.doc(
     summary="Election Get Office By Id",
