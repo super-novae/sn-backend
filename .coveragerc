@@ -1,4 +1,10 @@
 [run]
 omit = 
+    api/administrator/__init__.py
+    api/election/__init__.py
+    api/generic/__init__.py
+    api/organization/__init__.py
+    api/superuser/__init__.py
     api/tests/*
     api/test_data/*
+    api/voter/__init__.py

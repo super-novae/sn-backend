@@ -18,6 +18,8 @@ from ..test_data.election_data import (
     office_details,
     office_modified_details,
 )
+from ..test_data.voter_data import voter_create, voter_login
+from random import randint
 
 
 def test_election_create_successful(client):
@@ -306,6 +308,97 @@ def test_election_get_by_id_non_existent(client):
     truncate_db_tables()
 
 
+def test_election_get_by_id_full_details_successful(client):
+    # Clear database before tests
+    truncate_db_tables()
+
+    # Create seed to generate the same data
+    seed = randint(1, 200)
+
+    superuser_create()
+    administrator_signup(client)
+    organization = organization_create()
+    election = election_create()
+    office_create()
+    candidate = candidate_create()
+    voter_create(seed)
+
+    voter = voter_login(client, seed)
+
+    response = client.get(
+        f"api/v1/elections/{election.id}/full_details",
+        headers={"Authorization": f"Bearer {voter['auth_token']}"},
+    )
+
+    assert response.status_code == 200
+    assert response.json["election"]
+    assert response.json["offices"]
+
+    # Clear database before tests
+    truncate_db_tables()
+
+
+def test_election_get_by_id_full_details_unauthorized(client):
+    # Clear database before tests
+    truncate_db_tables()
+
+    # Create seed to generate the same data
+    seed = randint(1, 200)
+
+    superuser_create()
+    administrator_signup(client)
+    organization = organization_create()
+    election = election_create()
+    office_create()
+    candidate = candidate_create()
+    voter_create(seed)
+
+    superuser = superuser_login(client)
+
+    response = client.get(
+        f"api/v1/elections/{election.id}/full_details",
+        headers={"Authorization": f"Bearer {superuser['auth_token']}"},
+    )
+
+    assert response.status_code == 403
+    assert (
+        response.json["message"]
+        == "User does not have the required permissions to perform action"
+    )
+
+    # Clear database after tests
+    truncate_db_tables()
+
+
+def test_election_get_by_id_full_details_does_not_exist(client):
+    # Clear database before tests
+    truncate_db_tables()
+
+    # Create seed to generate the same data
+    seed = randint(1, 200)
+
+    superuser_create()
+    administrator_signup(client)
+    organization = organization_create()
+    election = election_create()
+    office_create()
+    candidate = candidate_create()
+    voter_create(seed)
+
+    voter = voter_login(client, seed)
+
+    response = client.get(
+        f"api/v1/elections/elec-{election.id[5:][::-1]}/full_details",
+        headers={"Authorization": f"Bearer {voter['auth_token']}"},
+    )
+
+    assert response.status_code == 404
+    assert response.json["message"] == "An election with the given ID does not exist"
+
+    # Clear database after tests
+    truncate_db_tables()
+
+
 def test_election_get_all_by_organization_id_successful(client):
     # Clear database before tests
     truncate_db_tables()
@@ -379,6 +472,9 @@ def test_office_create_successful(client):
     assert response.json["election_id"] == election.id
     assert len(response.json) == 4
 
+    # Clear database after tests
+    truncate_db_tables()
+
 
 def test_create_office_unauthorized(client):
     # Clear database before tests
@@ -404,6 +500,9 @@ def test_create_office_unauthorized(client):
         == "User does not have the required permissions to perform action"
     )
 
+    # Clear database after tests
+    truncate_db_tables()
+
 
 def test_modify_office_successful(client):
     # Clear database before tests
@@ -427,6 +526,9 @@ def test_modify_office_successful(client):
     assert response.status_code == 200
     assert response.json["message"] == "Office modified successfully"
     assert office.route_name == office_modified_details()["route_name"]
+
+    # Clear database after tests
+    truncate_db_tables()
 
 
 def test_modify_office_unauthorized(client):
@@ -454,6 +556,9 @@ def test_modify_office_unauthorized(client):
         == "User does not have the required permissions to perform action"
     )
 
+    # Clear database after tests
+    truncate_db_tables()
+
 
 def test_modify_office_not_found(client):
     # Clear database before tests
@@ -477,6 +582,9 @@ def test_modify_office_not_found(client):
     assert response.status_code == 404
     assert response.json["message"] == "An office with the given ID does not exist"
 
+    # Clear database after tests
+    truncate_db_tables()
+
 
 def test_delete_office_successful(client):
     # Clear database before tests
@@ -499,8 +607,11 @@ def test_delete_office_successful(client):
     assert response.status_code == 200
     assert response.json["message"] == "Office deleted successfully"
 
+    # Clear database after tests
+    truncate_db_tables()
 
-def test_delete_office_unauthorized(client):
+
+def test_election_delete_office_unauthorized(client):
     # Clear database before tests
     truncate_db_tables()
 
@@ -524,8 +635,11 @@ def test_delete_office_unauthorized(client):
         == "User does not have the required permissions to perform action"
     )
 
+    # Clear database after tests
+    truncate_db_tables()
 
-def test_delete_office_not_found(client):
+
+def test_election_delete_office_not_found(client):
     # Clear database before tests
     truncate_db_tables()
 
@@ -545,6 +659,143 @@ def test_delete_office_not_found(client):
 
     assert response.status_code == 404
     assert response.json["message"] == "An office with the given ID does not exist"
+
+    # Clear database after tests
+    truncate_db_tables()
+
+
+def test_election_get_office_by_id_succesful(client):
+    # Clear database before tests
+    truncate_db_tables()
+
+    # Initialize the data and model instances
+    superuser_create()
+    administrator_signup(client)
+    organization_create()
+    election = election_create()
+    office = office_create()
+
+    administrator = administrator_login(client)
+
+    response = client.get(
+        f"/api/v1/elections/{election.id}/office/{office.id}",
+        headers={"Authorization": f"Bearer {administrator['auth_token']}"},
+    )
+
+    assert response.status_code == 200
+    assert response.json["election_id"] == election.id
+    assert response.json["id"]
+
+    # Clear database after tests
+    truncate_db_tables()
+
+
+def test_election_get_office_by_id_office_not_found(client):
+    # Clear database before tests
+    truncate_db_tables()
+
+    # Initialize the data and model instances
+    superuser_create()
+    administrator_signup(client)
+    organization_create()
+    election = election_create()
+    office = office_create()
+
+    administrator = administrator_login(client)
+
+    response = client.get(
+        f"/api/v1/elections/{election.id}/office/{office.id[:4] + office.id[4:][::-1]}",
+        headers={"Authorization": f"Bearer {administrator['auth_token']}"},
+    )
+
+    assert response.status_code == 404
+    assert response.json["message"] == "An office with the given ID does not exist"
+
+    # Clear database after tests
+    truncate_db_tables()
+
+
+def test_election_get_office_by_id_unauthorized(client):
+    # Clear database before tests
+    truncate_db_tables()
+
+    # Initialize the data and model instances
+    superuser_create()
+    administrator_signup(client)
+    organization_create()
+    election = election_create()
+    office = office_create()
+
+    superuser = superuser_login(client)
+
+    response = client.get(
+        f"/api/v1/elections/{election.id}/office/{office.id}",
+        headers={"Authorization": f"Bearer {superuser['auth_token']}"},
+    )
+
+    assert response.status_code == 403
+    assert (
+        response.json["message"]
+        == "User does not have the required permissions to perform action"
+    )
+
+    # Clear database after tests
+    truncate_db_tables()
+
+
+def test_election_get_all_offices_by_election_id_successful(client):
+    # Clear database before tests
+    truncate_db_tables()
+
+    # Initialize the data and model instances
+    superuser_create()
+    administrator_signup(client)
+    organization_create()
+    election = election_create()
+    office = office_create()
+
+    administrator = administrator_login(client)
+
+    response = client.get(
+        f"/api/v1/elections/{election.id}/office/",
+        headers={"Authorization": f"Bearer {administrator['auth_token']}"},
+    )
+
+    assert response.status_code == 200
+    assert response.json["offices"]
+    assert response.json["offices"][0]["id"]
+    assert response.json["offices"][0]["election_id"] == election.id
+
+    # Clear database after tests
+    truncate_db_tables()
+
+
+def test_election_get_all_offices_by_election_id_unauthorized(client):
+    # Clear database before tests
+    truncate_db_tables()
+
+    # Initialize the data and model instances
+    superuser_create()
+    administrator_signup(client)
+    organization_create()
+    election = election_create()
+    office = office_create()
+
+    superuser = superuser_login(client)
+
+    response = client.get(
+        f"/api/v1/elections/{election.id}/office/",
+        headers={"Authorization": f"Bearer {superuser['auth_token']}"},
+    )
+
+    assert response.status_code == 403
+    assert (
+        response.json["message"]
+        == "User does not have the required permissions to perform action"
+    )
+
+    # Clear database after tests
+    truncate_db_tables()
 
 
 def test_election_create_candidate_successful(client):

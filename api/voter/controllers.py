@@ -133,7 +133,7 @@ def voter_get_by_id(voter_id):
 @voters.input(
     VoterGetAllInputSchema,
     location="query",
-    examples=["/?organization_id=org-1234123412341234123412341234"],
+    examples=["/?organization_id=org-12c41vc41vc41v34123412341234"],
 )  # TODO: Look at other options provided by input
 @voters.output(VotersSchema)
 @voters.doc(
@@ -157,7 +157,6 @@ def voter_get_all(query):
 
             return {"voters": voters}, 200
         raise OrganizationNotFound
-    raise VoterOrganizationIdNotProvided
 
 
 @voters.get("/<voter_id>/elections")
@@ -214,10 +213,11 @@ def voter_cast_vote(voter_id, data):
     return vote, 201
 
 
-@voters.post("/logout")
-@voters.doc(summary="Voter Logout", description="An endpoint for the voter to logout")
-def voter_logout():
-    pass
+# TODO: Implement voter logout
+# @voters.post("/logout")
+# @voters.doc(summary="Voter Logout", description="An endpoint for the voter to logout")
+# def voter_logout():
+#     pass
 
 
 # TODO: [Future] Update Bulk Student Data

@@ -1,7 +1,18 @@
 from .setup import truncate_db_tables
-from api.administrator.models import Administrator
-from api.test_data.admin_data import *
-from api.test_data.superuser_data import *
+from ..administrator.models import Administrator
+from ..test_data.admin_data import (
+    administrator_login,
+    administrator_login_correct_credentials,
+    administrator_login_wrong_credentials,
+    administrator_signup,
+    administrator_signup_correct_credentials,
+    administrator_signup_email_exists,
+    administrator_signup_username_exists,
+)
+from ..test_data.superuser_data import *
+from ..test_data.organization_data import organization_create
+from ..test_data.voter_data import voter_create, voter_login
+from random import randint
 
 
 def test_administrator_signup_successful(client):
@@ -77,6 +88,27 @@ def test_administrator_signup_email_exists(client):
     # Perform required checks
     assert response.status_code == 409
     assert response.json["message"] == "Administrator with this email already exists."
+
+
+def test_administrator_signup_unauthorized(client):
+    # Remove all data from database
+    truncate_db_tables()
+
+    superuser_create()
+    administrator_signup(client)
+    administrator = administrator_login(client)
+
+    response = client.post(
+        "/api/v1/administrators/signup",
+        json=administrator_signup_email_exists(),
+        headers={"Authorization": f"Bearer {administrator['auth_token']}"},
+    )
+
+    assert response.status_code == 403
+    assert (
+        response.json["message"]
+        == "User does not have the required permissions to perform action"
+    )
 
 
 def test_administrator_login_successful(client):
@@ -234,7 +266,29 @@ def test_administrator_get_by_id_non_existent(client):
     )
 
 
-# TODO: Work on this later
-def test_administrator_get_by_id_not_authorized():
+def test_administrator_get_by_id_not_authorized(client):
     # Remove all data from database
     truncate_db_tables()
+
+    # Create seed to generate the same data
+    seed = randint(1, 200)
+
+    # Initialize the data and model instances
+    superuser_create()
+    created_administrator = administrator_signup(client)
+    organization_create()
+    voter_create(seed)
+
+    voter = voter_login(client, seed)
+
+    # Create a request and store the response
+    response = client.get(
+        f"/api/v1/administrators/{created_administrator['id']}",
+        headers={"Authorization": f"Bearer {voter['auth_token']}"},
+    )
+
+    assert response.status_code == 403
+    assert (
+        response.json["message"]
+        == "User does not have the required permissions to perform action"
+    )
