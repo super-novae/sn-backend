@@ -1,3 +1,4 @@
+import re
 from apiflask import Schema
 from apiflask.fields import String, Email, List, Nested
 
@@ -8,6 +9,12 @@ class AdministratorSchema(Schema):
     username = String(required=True)
     email = Email(required=True)
     password = String(load_only=True, required=True)
+
+
+class AdministratorModifySchema(Schema):
+    name = String(required=False)
+    username = String(required=False)
+    email = String(required=False)
 
 
 class AdministratorsSchema(Schema):

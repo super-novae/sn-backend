@@ -15,6 +15,9 @@ class AdministratorWithCredentialsDoesNotExist(HTTPError):
     status_code: int = 404
     message: str = "Administrator with the given credentials does not exist."
 
+class AdministratorWithIdDoesNotExist(HTTPError):
+    status_code: int = 404
+    message: str = "Administrator with the given Id does not exist"
 
 class AdministratorTokenExpired(HTTPError):
     status_code: int = 401

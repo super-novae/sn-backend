@@ -4,6 +4,7 @@ from ..test_data.admin_data import (
     administrator_login,
     administrator_login_correct_credentials,
     administrator_login_wrong_credentials,
+    administrator_modify,
     administrator_signup,
     administrator_signup_correct_credentials,
     administrator_signup_email_exists,
@@ -36,7 +37,7 @@ def test_administrator_signup_successful(client):
     )
 
     # Perform required checks
-    assert response.status_code == 200
+    assert response.status_code == 201
     assert response.json["email"] == administrator_signup_correct_credentials()["email"]
     assert response.json["name"] == administrator_signup_correct_credentials()["name"]
     assert (
@@ -101,6 +102,126 @@ def test_administrator_signup_unauthorized(client):
     response = client.post(
         "/api/v1/administrators/signup",
         json=administrator_signup_email_exists(),
+        headers={"Authorization": f"Bearer {administrator['auth_token']}"},
+    )
+
+    assert response.status_code == 403
+    assert (
+        response.json["message"]
+        == "User does not have the required permissions to perform action"
+    )
+
+
+def test_administrator_modify_successful(client):
+    # Remove all data from database
+    truncate_db_tables()
+
+    # Initialize data and model instances
+    superuser_create()
+    administrator = administrator_signup(client)
+    superuser = superuser_login(client)
+
+    response = client.put(
+        f"/api/v1/administrators/{administrator['id']}",
+        json=administrator_modify(),
+        headers={"Authorization": f"Bearer {superuser['auth_token']}"},
+    )
+
+    assert response.status_code == 200
+    assert response.json["message"] == "Administrator modified successfully"
+
+
+def test_administrator_modify_id_non_existent(client):
+    # Remove all data from database
+    truncate_db_tables()
+
+    # Initialize data and model instances
+    superuser_create()
+    administrator = administrator_signup(client)
+    superuser = superuser_login(client)
+
+    response = client.put(
+        f"/api/v1/administrators/{administrator['id'][:6] + administrator['id'][6:][::-1]}",
+        json=administrator_modify(),
+        headers={"Authorization": f"Bearer {superuser['auth_token']}"},
+    )
+    assert response.status_code == 404
+    assert response.json["message"] == "Administrator with the given Id does not exist"
+
+
+def test_administrator_modify_unauthorized(client):
+    # Remove all data from database
+    truncate_db_tables()
+
+    # Initialize data and model instances
+    superuser_create()
+    administrator_signup(client)
+    superuser_login(client)
+    administrator = administrator_login(client)
+
+    response = client.put(
+        f"/api/v1/administrators/{administrator['id']}",
+        json=administrator_modify(),
+        headers={"Authorization": f"Bearer {administrator['auth_token']}"},
+    )
+
+    assert response.status_code == 403
+    assert (
+        response.json["message"]
+        == "User does not have the required permissions to perform action"
+    )
+
+
+def test_administrator_delete_successful(client):
+    # Remove all data from database
+    truncate_db_tables()
+
+    # Initialize data and model instances
+    superuser_create()
+    administrator_signup(client)
+    superuser = superuser_login(client)
+    administrator = administrator_login(client)
+
+    response = client.delete(
+        f"/api/v1/administrators/{administrator['id']}",
+        headers={"Authorization": f"Bearer {superuser['auth_token']}"},
+    )
+
+    assert response.status_code == 200
+    assert response.json["message"] == "Administrator deleted successfully"
+
+
+def test_administrator_delete_id_non_existent(client):
+    # Remove all data from database
+    truncate_db_tables()
+
+    # Initialize data and model instances
+    superuser_create()
+    administrator_signup(client)
+    superuser = superuser_login(client)
+    administrator = administrator_login(client)
+
+    response = client.delete(
+        f"/api/v1/administrators/{administrator['id'][:6] + administrator['id'][6:][::-1]}",
+        headers={"Authorization": f"Bearer {superuser['auth_token']}"},
+    )
+
+    assert response.status_code == 404
+    assert response.json["message"] == "Administrator with the given Id does not exist"
+
+
+def test_administrator_delete_unauthorized(client):
+    # Remove all data from database
+    truncate_db_tables()
+
+    # Initialize data and model instances
+    superuser_create()
+    administrator_signup(client)
+    superuser = superuser_login(client)
+    administrator = administrator_login(client)
+
+    response = client.delete(
+        f"/api/v1/administrators/{administrator['id'][:6] + administrator['id'][6:][::-1]}",
         headers={"Authorization": f"Bearer {administrator['auth_token']}"},
     )
 
