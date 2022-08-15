@@ -32,7 +32,7 @@ administrator = APIBlueprint(
 
 @administrator.post("/signup")
 @administrator.input(AdministratorSchema)
-@administrator.output(AdministratorSchema)
+@administrator.output(AdministratorSchema, status_code=201)
 @administrator.doc(
     summary="Administrator Sign Up",
     description="An endpoint for the creation of administrators",
@@ -97,15 +97,15 @@ def administrator_modify(admin_id, data):
     admin = Administrator.find_by_id(admin_id)
     if not admin:
         raise AdministratorWithIdDoesNotExist
-    
+
     # Checking if admin with the same email exists
-    if data.get('email', None):
+    if data.get("email", None):
         admin_email_exists = Administrator.find_by_email(data["email"])
         if admin_email_exists:
             raise AdministratorWithEmailExists
 
     # Check if admin with the same username exists
-    if data.get('username', None):
+    if data.get("username", None):
         admin_username_exists = Administrator.find_by_username(data["username"])
         if admin_username_exists:
             raise AdministratorWithUsernameExists
