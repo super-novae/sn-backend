@@ -24,7 +24,7 @@ def test_organization_create_successful(client):
         headers={"Authorization": f"Bearer {superuser['auth_token']}"},
     )
 
-    assert response.status_code == 200
+    assert response.status_code == 201
     assert response.json["id"][:4] == "org-"
 
     # Clear database after tests

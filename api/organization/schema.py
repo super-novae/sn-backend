@@ -1,10 +1,12 @@
 from apiflask import Schema
 from apiflask.fields import String
-from apiflask.validators import Length
+from apiflask.validators import Length, Regexp
 
 
 class OrganizationSchema(Schema):
-    administrator_id = String(required=True, validate=[Length(equal=32)])
+    administrator_id = String(
+        required=True, validate=[Length(equal=32), Regexp("^admin-")]
+    )
     name = String(required=True, validate=[Length(4, 256)])
     id = String(required=True, dump_only=True, validate=[Length(32)])
 
