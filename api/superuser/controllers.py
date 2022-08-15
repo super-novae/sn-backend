@@ -1,3 +1,4 @@
+from urllib import response
 from apiflask import APIBlueprint
 from flask_jwt_extended import create_access_token
 from .errors import SuperuserWithCredentialsDoesNotExist
@@ -12,10 +13,20 @@ superuser = APIBlueprint(
 
 
 @superuser.post("/login")
-@superuser.input(SuperuserLoginSchema)
-@superuser.output(SuperUserSchema)
+@superuser.input(
+    SuperuserLoginSchema,
+    example={"username": "tturner", "password": "averycomplexpassword"},
+)
+@superuser.output(
+    SuperUserSchema,
+    example={
+        "auth_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+    },
+)
 @superuser.doc(
-    summary="Superuser Login", description="An endpoint for login of the superuser"
+    summary="Superuser Login",
+    description="An endpoint for login of the superuser",
+    responses=[200, 404],
 )
 def superuser_login(data):
     superuser: Superuser = Superuser.find_by_username(username=data["username"])
