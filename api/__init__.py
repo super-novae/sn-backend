@@ -14,7 +14,7 @@ load_dotenv()
 
 
 def create_app():
-    app = APIFlask(__name__, title="sn-backend", version="1.0.0")
+    app = APIFlask(__name__, title="sn-backend", version="1.0.0", docs_ui="redoc")
 
     # Load configurations
     app.config.from_object(config_dict[getenv("FLASK_ENV")])
