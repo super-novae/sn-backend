@@ -1,8 +1,8 @@
 from .setup import truncate_db_tables
 from api.test_data.superuser_data import (
-    superuser_create, 
-    superuser_login_correct_credentials, 
-    superuser_login_wrong_credentials
+    superuser_create,
+    superuser_login_correct_credentials,
+    superuser_login_wrong_credentials,
 )
 
 

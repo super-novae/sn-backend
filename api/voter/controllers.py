@@ -90,7 +90,7 @@ def voter_bulk_signup(data):
         logger.warning(exc_info())
         db.session.rollback()
         abort(500)
-    
+
     finally:
         db.session.close()
 
@@ -221,13 +221,13 @@ def voter_cast_vote(voter_id, data):
     try:
         db.session.add(vote)
         db.session.commit()
-    
+
     except Exception:
         error = True
         logger.warning(exc_info())
         db.session.rollback()
         abort(500)
-    
+
     finally:
         db.session.close()
 

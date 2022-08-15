@@ -43,7 +43,7 @@ def election_create(data):
         raise UserDoesNotHaveRequiredRoles
 
     election = Election(**data)
-    
+
     try:
         db.session.add(election)
         db.session.commit()
@@ -53,10 +53,10 @@ def election_create(data):
         logger.warning(exc_info())
         db.session.rollback()
         abort(500)
-    
+
     finally:
         db.session.close()
-    
+
     if not error:
         return election, 201
 
@@ -84,7 +84,7 @@ def election_modify(election_id, data):
 
     for attribute, value in data.items():
         setattr(election, attribute, value)
-    
+
     try:
         db.session.commit()
 
@@ -93,7 +93,7 @@ def election_modify(election_id, data):
         logger.warning(exc_info())
         db.session.rollback()
         abort(500)
-    
+
     finally:
         db.session.close()
 
@@ -124,16 +124,16 @@ def election_delete(election_id):
     try:
         db.session.delete(election)
         db.session.commit()
-    
+
     except Exception:
         error = True
         logger.warning(exc_info())
         db.session.rollback()
         abort(500)
-    
+
     finally:
         db.session.close()
-    
+
     if not error:
         return {"message": "Election deleted successfully"}, 200
 
@@ -238,16 +238,16 @@ def election_create_office(election_id, data):
     try:
         db.session.add(office)
         db.session.commit()
-    
+
     except Exception:
         error = True
         logger.warning(exc_info())
         db.session.rollback()
         abort(500)
-    
+
     finally:
         db.session.close()
-    
+
     if not error:
         return office, 201
 
@@ -278,13 +278,13 @@ def election_modify_office(election_id, office_id, data):
 
     try:
         db.session.commit()
-    
+
     except Exception:
         error = True
         logger.warning(exc_info())
         db.session.rollback()
         abort(500)
-    
+
     finally:
         db.session.close()
 
@@ -311,20 +311,20 @@ def election_delete_office(election_id, office_id):
 
     if not office:
         raise OfficeDoesNotExist
-    
+
     try:
         db.session.delete(office)
         db.session.commit()
-    
+
     except Exception:
         error = True
         logger.warning(exc_info())
         db.session.rollback()
         abort(500)
-    
+
     finally:
         db.session.close()
-    
+
     if not error:
         return {"message": "Office deleted successfully"}, 200
 
@@ -385,17 +385,17 @@ def election_create_candidate(election_id, data):
         raise UserDoesNotHaveRequiredRoles
 
     candidate = Candidate(**data)
-    
+
     try:
         db.session.add(candidate)
         db.session.commit()
-    
+
     except Exception:
         error = True
         logger.warning(exc_info())
         db.session.rollback()
         abort(500)
-    
+
     finally:
         db.session.close()
 
@@ -435,7 +435,7 @@ def election_modify_candidate(election_id, candidate_id, data):
         logger.warning(exc_info())
         db.session.rollback()
         abort(500)
-    
+
     finally:
         db.session.close()
 
@@ -466,13 +466,13 @@ def election_delete_candidate(election_id, candidate_id):
     try:
         db.session.delete(candidate)
         db.session.commit()
-    
+
     except Exception:
         error = True
         logger.warning(exc_info())
         db.session.rollback()
         abort(500)
-    
+
     finally:
         db.session.close()
 
