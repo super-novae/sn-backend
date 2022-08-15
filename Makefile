@@ -4,6 +4,9 @@ create_env:
 	pip install -r requirements.txt
 
 check_coverage:
+	pytest --cov-config=.coveragerc --cov-report term-missing --cov=api --cov-fail-under=80
+
+generate coverage_report:
 	pytest --cov-config=.coveragerc --cov-report term-missing --cov-report html:test_coverage --cov=api --cov-fail-under=80
 
 # activate:
