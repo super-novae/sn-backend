@@ -30,8 +30,11 @@ class TestingConfig(BaseConfig):
 
 
 class ProductionConfig(BaseConfig):
-    SQLALCHEMY_DATABASE_URI = getenv("DATABASE_URL")
     BCRYPT_LOG_ROUNDS = 12
+    SQLALCHEMY_DATABASE_URI = getenv("DATABASE_URL")
+    if SQLALCHEMY_DATABASE_URI.startswith("postgres://"):
+        SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI.replace(
+            "postgres://", "postgresql://", 1)
 
 
 config_dict = {
