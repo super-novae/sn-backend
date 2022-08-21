@@ -43,7 +43,7 @@ jobs:
       
       - name: Perform vulnerability assessment with pip-audit
         run: |
-          pip-audit --requirement requirements.txt
+          make vulnerability-assessment
     
 
   test:

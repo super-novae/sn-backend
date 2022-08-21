@@ -25,6 +25,9 @@ migrate:
 upgrade:
 	flask db upgrade
 
+vulnerability-assessment:
+	pip-audit --requirement requirements.txt
+
 test_admin:
 	pytest api/tests/test_admin.py --verbose
 
