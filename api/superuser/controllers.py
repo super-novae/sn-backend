@@ -1,4 +1,3 @@
-from urllib import response
 from apiflask import APIBlueprint
 from flask_jwt_extended import create_access_token
 from .errors import SuperuserWithCredentialsDoesNotExist
@@ -29,7 +28,9 @@ superuser = APIBlueprint(
     responses=[200, 404],
 )
 def superuser_login(data):
-    superuser: Superuser = Superuser.find_by_username(username=data["username"])
+    superuser: Superuser = Superuser.find_by_username(
+        username=data["username"]
+    )
 
     if superuser:
         superuser_password_is_correct = superuser.verify_superuser(

@@ -100,7 +100,10 @@ def test_organization_modify_by_id_non_existent(client):
     )
 
     assert response.status_code == 404
-    assert response.json["message"] == "Organization with the given ID does not exists"
+    assert (
+        response.json["message"]
+        == "Organization with the given ID does not exists"
+    )
 
     # Clear database after tests
     truncate_db_tables()
@@ -178,7 +181,10 @@ def test_organization_delete_by_id_non_existent(client):
     )
 
     assert response.status_code == 404
-    assert response.json["message"] == "Organization with the given ID does not exists"
+    assert (
+        response.json["message"]
+        == "Organization with the given ID does not exists"
+    )
 
     # Clear database after tests
     truncate_db_tables()

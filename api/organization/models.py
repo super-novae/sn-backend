@@ -5,11 +5,15 @@ from secrets import token_hex
 class Organization(db.Model):
     __tablename__ = "sn_organization"
 
-    id = db.Column(db.String(length=32), nullable=False, unique=True, primary_key=True)
+    id = db.Column(
+        db.String(length=32), nullable=False, unique=True, primary_key=True
+    )
     name = db.Column(db.String(length=256), nullable=False)
     elections = db.relationship("Election")
     administrator_id = db.Column(
-        db.String(length=32), db.ForeignKey("sn_administrator.id"), nullable=False
+        db.String(length=32),
+        db.ForeignKey("sn_administrator.id"),
+        nullable=False,
     )
 
     def __init__(self, name, administrator_id):

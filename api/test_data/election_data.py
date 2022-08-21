@@ -34,7 +34,11 @@ def election_get_test_instance() -> Election:
 
 def office_details():
     election = election_get_test_instance()
-    return {"name": "President", "route_name": "gadres", "election_id": election.id}
+    return {
+        "name": "President",
+        "route_name": "gadres",
+        "election_id": election.id,
+    }
 
 
 def office_modified_details():
@@ -53,7 +57,8 @@ def office_create() -> Office:
 
 def office_get_test_instance() -> Office:
     return Office.query.filter_by(
-        name=office_details()["name"], route_name=office_details()["route_name"]
+        name=office_details()["name"],
+        route_name=office_details()["route_name"],
     ).first()
 
 
@@ -86,4 +91,6 @@ def candidate_create() -> Candidate:
 
 
 def candidate_get_test_instance(id=None) -> Candidate:
-    return Candidate.query.filter_by(programme="Bsc. Computer Engineering").first()
+    return Candidate.query.filter_by(
+        programme="Bsc. Computer Engineering"
+    ).first()

@@ -1,7 +1,6 @@
 from .errors import (
     VoterDoesNotExist,
     VoterAlreadyExists,
-    VoterOrganizationIdNotProvided,
     VoterHasAlreadyVoted,
     VoterWrongCredentials,
 )
@@ -17,15 +16,23 @@ from .schema import (
 from apiflask import APIBlueprint, abort
 from api.election.models import Election
 from api.extensions import db, logger
-from api.generic.errors import UserDoesNotHaveRequiredRoles, InternalServerError
+from api.generic.errors import (
+    UserDoesNotHaveRequiredRoles,
+)
 from api.generic.methods import has_roles
 from api.generic.responses import GenericMessage
 from api.organization.errors import OrganizationNotFound
 from api.organization.models import Organization
-from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
+from flask_jwt_extended import (
+    create_access_token,
+    get_jwt_identity,
+    jwt_required,
+)
 from sys import exc_info
 
-voters = APIBlueprint("voter", __name__, tag="Voter", url_prefix="/api/v1/voters")
+voters = APIBlueprint(
+    "voter", __name__, tag="Voter", url_prefix="/api/v1/voters"
+)
 
 
 @voters.post("/signup")
@@ -95,7 +102,9 @@ def voter_bulk_signup(data):
         db.session.close()
 
     if not error:
-        return {"message": f"{total_number_of_voters} voters created successfully"}, 200
+        return {
+            "message": f"{total_number_of_voters} voters created successfully"
+        }, 200
 
 
 @voters.post("/login")

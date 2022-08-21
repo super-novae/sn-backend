@@ -1,4 +1,3 @@
-from csv import list_dialects
 from apiflask import Schema
 from apiflask.fields import String, List, Nested
 from apiflask.validators import Length, Regexp, URL, OneOf
@@ -30,7 +29,9 @@ class OfficeSchema(Schema):
     id = String(required=True, dump_only=True)
     name = String(required=True)
     route_name = String(required=True, validate=[Length(min=4, max=50)])
-    election_id = String(required=True, validate=[Regexp("^elec-"), Length(equal=32)])
+    election_id = String(
+        required=True, validate=[Regexp("^elec-"), Length(equal=32)]
+    )
 
 
 class OfficesSchema(Schema):

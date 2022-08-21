@@ -11,7 +11,9 @@ load_dotenv()
 class Voter(db.Model):
     __tablename__ = "sn_voter"
 
-    id = db.Column(db.String(length=32), nullable=False, unique=True, primary_key=True)
+    id = db.Column(
+        db.String(length=32), nullable=False, unique=True, primary_key=True
+    )
     student_id = db.Column(db.String(length=8), nullable=False)
     name = db.Column(db.String(80), nullable=False)
     username = db.Column(db.String(15), nullable=False, unique=True)
@@ -23,7 +25,9 @@ class Voter(db.Model):
     date_created = db.Column(db.DateTime(), nullable=False)
     password_hash = db.Column(db.String(length=130), nullable=False)
     organization_id = db.Column(
-        db.String(length=32), db.ForeignKey("sn_organization.id"), nullable=False
+        db.String(length=32),
+        db.ForeignKey("sn_organization.id"),
+        nullable=False,
     )
 
     def __init__(
@@ -53,11 +57,17 @@ class Voter(db.Model):
 
         if len(splitted_name) > 1:
             self.username = (
-                splitted_name[1][0] + splitted_name[0][:9] + "-" + token_urlsafe()[:4]
+                splitted_name[1][0]
+                + splitted_name[0][:9]
+                + "-"
+                + token_urlsafe()[:4]
             )
         else:
             self.username = (
-                splitted_name[1][0] + splitted_name[0][:9] + "-" + token_urlsafe()[:4]
+                splitted_name[1][0]
+                + splitted_name[0][:9]
+                + "-"
+                + token_urlsafe()[:4]
             )
 
     @property
@@ -110,7 +120,9 @@ class Vote(db.Model):
     # TODO: Check if voter has already using the voter id & office id
     @classmethod
     def voter_vote_exists(cls, voter_id, office_id):
-        return cls.query.filter_by(voter_id=voter_id, office_id=office_id).first()
+        return cls.query.filter_by(
+            voter_id=voter_id, office_id=office_id
+        ).first()
 
     # TODO: Retrive all src votes (results)
     # @classmethod

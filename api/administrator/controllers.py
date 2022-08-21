@@ -1,5 +1,9 @@
 from apiflask import APIBlueprint, abort
-from flask_jwt_extended import jwt_required, create_access_token, get_jwt_identity
+from flask_jwt_extended import (
+    jwt_required,
+    create_access_token,
+    get_jwt_identity,
+)
 
 from ..generic.responses import GenericMessage
 from api.extensions import db, logger
@@ -106,7 +110,9 @@ def administrator_modify(admin_id, data):
 
     # Check if admin with the same username exists
     if data.get("username", None):
-        admin_username_exists = Administrator.find_by_username(data["username"])
+        admin_username_exists = Administrator.find_by_username(
+            data["username"]
+        )
         if admin_username_exists:
             raise AdministratorWithUsernameExists
 

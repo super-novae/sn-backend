@@ -28,7 +28,9 @@ def test_administrator_signup_successful(client):
     response = client.post(
         "/api/v1/administrators/signup",
         json=administrator_signup_correct_credentials(),
-        headers={"Authorization": f"Bearer {logged_in_superuser['auth_token']}"},
+        headers={
+            "Authorization": f"Bearer {logged_in_superuser['auth_token']}"
+        },
     )
 
     # Created administrator
@@ -38,8 +40,14 @@ def test_administrator_signup_successful(client):
 
     # Perform required checks
     assert response.status_code == 201
-    assert response.json["email"] == administrator_signup_correct_credentials()["email"]
-    assert response.json["name"] == administrator_signup_correct_credentials()["name"]
+    assert (
+        response.json["email"]
+        == administrator_signup_correct_credentials()["email"]
+    )
+    assert (
+        response.json["name"]
+        == administrator_signup_correct_credentials()["name"]
+    )
     assert (
         response.json["username"]
         == administrator_signup_correct_credentials()["username"]
@@ -60,13 +68,16 @@ def test_administrator_signup_username_exists(client):
     response = client.post(
         "/api/v1/administrators/signup",
         json=administrator_signup_username_exists(),
-        headers={"Authorization": f"Bearer {logged_in_superuser['auth_token']}"},
+        headers={
+            "Authorization": f"Bearer {logged_in_superuser['auth_token']}"
+        },
     )
 
     # Perform required checks
     assert response.status_code == 409
     assert (
-        response.json["message"] == "Administrator with this username already exists."
+        response.json["message"]
+        == "Administrator with this username already exists."
     )
 
 
@@ -83,12 +94,17 @@ def test_administrator_signup_email_exists(client):
     response = client.post(
         "/api/v1/administrators/signup",
         json=administrator_signup_email_exists(),
-        headers={"Authorization": f"Bearer {logged_in_superuser['auth_token']}"},
+        headers={
+            "Authorization": f"Bearer {logged_in_superuser['auth_token']}"
+        },
     )
 
     # Perform required checks
     assert response.status_code == 409
-    assert response.json["message"] == "Administrator with this email already exists."
+    assert (
+        response.json["message"]
+        == "Administrator with this email already exists."
+    )
 
 
 def test_administrator_signup_unauthorized(client):
@@ -146,7 +162,10 @@ def test_administrator_modify_id_non_existent(client):
         headers={"Authorization": f"Bearer {superuser['auth_token']}"},
     )
     assert response.status_code == 404
-    assert response.json["message"] == "Administrator with the given Id does not exist"
+    assert (
+        response.json["message"]
+        == "Administrator with the given Id does not exist"
+    )
 
 
 def test_administrator_modify_unauthorized(client):
@@ -207,7 +226,10 @@ def test_administrator_delete_id_non_existent(client):
     )
 
     assert response.status_code == 404
-    assert response.json["message"] == "Administrator with the given Id does not exist"
+    assert (
+        response.json["message"]
+        == "Administrator with the given Id does not exist"
+    )
 
 
 def test_administrator_delete_unauthorized(client):
@@ -217,7 +239,7 @@ def test_administrator_delete_unauthorized(client):
     # Initialize data and model instances
     superuser_create()
     administrator_signup(client)
-    superuser = superuser_login(client)
+    superuser_login(client)
     administrator = administrator_login(client)
 
     response = client.delete(
@@ -242,11 +264,15 @@ def test_administrator_login_successful(client):
 
     # Create a request and store the response
     response = client.post(
-        "/api/v1/administrators/login", json=administrator_login_correct_credentials()
+        "/api/v1/administrators/login",
+        json=administrator_login_correct_credentials(),
     )
 
     assert response.status_code == 200
-    assert response.json["email"] == administrator_login_correct_credentials()["email"]
+    assert (
+        response.json["email"]
+        == administrator_login_correct_credentials()["email"]
+    )
     assert response.json["name"] == created_administrator["name"]
     assert response.json["id"] == created_administrator["id"]
     assert response.json["username"] == created_administrator["username"]
@@ -263,7 +289,8 @@ def test_administrator_login_wrong_credentials(client):
 
     # Create a request and store the response
     response = client.post(
-        "/api/v1/administrators/login", json=administrator_login_wrong_credentials()
+        "/api/v1/administrators/login",
+        json=administrator_login_wrong_credentials(),
     )
 
     assert response.status_code == 404
@@ -285,14 +312,24 @@ def test_administrator_get_all_successful(client):
     # Create a request and store the response
     response = client.get(
         "/api/v1/administrators/",
-        headers={"Authorization": f"Bearer {logged_in_superuser['auth_token']}"},
+        headers={
+            "Authorization": f"Bearer {logged_in_superuser['auth_token']}"
+        },
     )
 
     assert response.status_code == 200
     assert len(response.json) == 1
-    assert response.json["administrators"][0]["email"] == created_administrator["email"]
-    assert response.json["administrators"][0]["name"] == created_administrator["name"]
-    assert response.json["administrators"][0]["id"] == created_administrator["id"]
+    assert (
+        response.json["administrators"][0]["email"]
+        == created_administrator["email"]
+    )
+    assert (
+        response.json["administrators"][0]["name"]
+        == created_administrator["name"]
+    )
+    assert (
+        response.json["administrators"][0]["id"] == created_administrator["id"]
+    )
     assert (
         response.json["administrators"][0]["username"]
         == created_administrator["username"]
@@ -311,7 +348,9 @@ def test_administrator_get_all_not_authorized(client):
     # Create a request and store the response
     response = client.get(
         "/api/v1/administrators/",
-        headers={"Authorization": f"Bearer {logged_in_administrator['auth_token']}"},
+        headers={
+            "Authorization": f"Bearer {logged_in_administrator['auth_token']}"
+        },
     )
 
     assert response.status_code == 403
@@ -333,7 +372,9 @@ def test_administrator_get_by_id_successful_admin(client):
     # Create a request and store the response
     response = client.get(
         f"/api/v1/administrators/{logged_in_administrator['id']}",
-        headers={"Authorization": f"Bearer {logged_in_administrator['auth_token']}"},
+        headers={
+            "Authorization": f"Bearer {logged_in_administrator['auth_token']}"
+        },
     )
 
     assert response.status_code == 200
@@ -355,7 +396,9 @@ def test_administrator_get_by_id_successful_superuser(client):
     # Create a request and store the response
     response = client.get(
         f"/api/v1/administrators/{created_administrator['id']}",
-        headers={"Authorization": f"Bearer {logged_in_superuser['auth_token']}"},
+        headers={
+            "Authorization": f"Bearer {logged_in_superuser['auth_token']}"
+        },
     )
 
     assert response.status_code == 200
@@ -377,7 +420,9 @@ def test_administrator_get_by_id_non_existent(client):
     # Create a request and store the response
     response = client.get(
         f"/api/v1/administrators/{created_administrator['id'] + 'goof'}",
-        headers={"Authorization": f"Bearer {logged_in_superuser['auth_token']}"},
+        headers={
+            "Authorization": f"Bearer {logged_in_superuser['auth_token']}"
+        },
     )
 
     assert response.status_code == 404

@@ -40,7 +40,10 @@ def test_election_create_successful(client):
 
     assert response.status_code == 201
     assert response.json["name"] == election_details()["name"]
-    assert response.json["organization_id"] == election_details()["organization_id"]
+    assert (
+        response.json["organization_id"]
+        == election_details()["organization_id"]
+    )
 
     # Clear database after tests
     truncate_db_tables()
@@ -146,7 +149,10 @@ def test_election_modify_non_existent(client):
     )
 
     assert response.status_code == 404
-    assert response.json["message"] == "An election with the given ID does not exist"
+    assert (
+        response.json["message"]
+        == "An election with the given ID does not exist"
+    )
 
     # Clear database after tests
     truncate_db_tables()
@@ -224,7 +230,10 @@ def test_election_delete_non_existent(client):
     )
 
     assert response.status_code == 404
-    assert response.json["message"] == "An election with the given ID does not exist"
+    assert (
+        response.json["message"]
+        == "An election with the given ID does not exist"
+    )
 
     # Clear database after tests
     truncate_db_tables()
@@ -250,7 +259,8 @@ def test_election_get_by_id_successful(client):
     assert response.status_code == 200
     assert response.json["name"] == election_get_test_instance().name
     assert (
-        response.json["organization_id"] == election_get_test_instance().organization_id
+        response.json["organization_id"]
+        == election_get_test_instance().organization_id
     )
 
     # Clear database after tests
@@ -302,7 +312,10 @@ def test_election_get_by_id_non_existent(client):
     )
 
     assert response.status_code == 404
-    assert response.json["message"] == "An election with the given ID does not exist"
+    assert (
+        response.json["message"]
+        == "An election with the given ID does not exist"
+    )
 
     # Clear database after tests
     truncate_db_tables()
@@ -317,10 +330,10 @@ def test_election_get_by_id_full_details_successful(client):
 
     superuser_create()
     administrator_signup(client)
-    organization = organization_create()
+    organization_create()
     election = election_create()
     office_create()
-    candidate = candidate_create()
+    candidate_create()
     voter_create(seed)
 
     voter = voter_login(client, seed)
@@ -347,10 +360,10 @@ def test_election_get_by_id_full_details_unauthorized(client):
 
     superuser_create()
     administrator_signup(client)
-    organization = organization_create()
+    organization_create()
     election = election_create()
     office_create()
-    candidate = candidate_create()
+    candidate_create()
     voter_create(seed)
 
     superuser = superuser_login(client)
@@ -379,10 +392,10 @@ def test_election_get_by_id_full_details_does_not_exist(client):
 
     superuser_create()
     administrator_signup(client)
-    organization = organization_create()
+    organization_create()
     election = election_create()
     office_create()
-    candidate = candidate_create()
+    candidate_create()
     voter_create(seed)
 
     voter = voter_login(client, seed)
@@ -393,7 +406,10 @@ def test_election_get_by_id_full_details_does_not_exist(client):
     )
 
     assert response.status_code == 404
-    assert response.json["message"] == "An election with the given ID does not exist"
+    assert (
+        response.json["message"]
+        == "An election with the given ID does not exist"
+    )
 
     # Clear database after tests
     truncate_db_tables()
@@ -580,7 +596,10 @@ def test_modify_office_not_found(client):
     )
 
     assert response.status_code == 404
-    assert response.json["message"] == "An office with the given ID does not exist"
+    assert (
+        response.json["message"]
+        == "An office with the given ID does not exist"
+    )
 
     # Clear database after tests
     truncate_db_tables()
@@ -658,7 +677,10 @@ def test_election_delete_office_not_found(client):
     )
 
     assert response.status_code == 404
-    assert response.json["message"] == "An office with the given ID does not exist"
+    assert (
+        response.json["message"]
+        == "An office with the given ID does not exist"
+    )
 
     # Clear database after tests
     truncate_db_tables()
@@ -709,7 +731,10 @@ def test_election_get_office_by_id_office_not_found(client):
     )
 
     assert response.status_code == 404
-    assert response.json["message"] == "An office with the given ID does not exist"
+    assert (
+        response.json["message"]
+        == "An office with the given ID does not exist"
+    )
 
     # Clear database after tests
     truncate_db_tables()
@@ -752,7 +777,7 @@ def test_election_get_all_offices_by_election_id_successful(client):
     administrator_signup(client)
     organization_create()
     election = election_create()
-    office = office_create()
+    office_create()
 
     administrator = administrator_login(client)
 
@@ -779,7 +804,7 @@ def test_election_get_all_offices_by_election_id_unauthorized(client):
     administrator_signup(client)
     organization_create()
     election = election_create()
-    office = office_create()
+    office_create()
 
     superuser = superuser_login(client)
 
@@ -937,7 +962,10 @@ def test_election_modify_candidate_non_existent(client):
     )
 
     assert response.status_code == 404
-    assert response.json["message"] == "A candidate with the given ID does not exist"
+    assert (
+        response.json["message"]
+        == "A candidate with the given ID does not exist"
+    )
 
     # Clear database after tests
     truncate_db_tables()
@@ -1018,7 +1046,10 @@ def test_election_delete_candidate_non_existent(client):
     )
 
     assert response.status_code == 404
-    assert response.json["message"] == "A candidate with the given ID does not exist"
+    assert (
+        response.json["message"]
+        == "A candidate with the given ID does not exist"
+    )
 
     # Clear database after tests
     truncate_db_tables()
@@ -1059,7 +1090,7 @@ def test_election_get_candidate_by_id_unauthorized(client):
     # Initialize the data and model instances
     superuser_create()
     administrator_signup(client)
-    organization = organization_create()
+    organization_create()
     election = election_create()
     office_create()
     candidate = candidate_create()
@@ -1088,7 +1119,7 @@ def test_election_get_candidate_by_id_non_existent(client):
     # Initialize the data and model instances
     superuser_create()
     administrator_signup(client)
-    organization = organization_create()
+    organization_create()
     election = election_create()
     office_create()
     candidate = candidate_create()
@@ -1101,7 +1132,10 @@ def test_election_get_candidate_by_id_non_existent(client):
     )
 
     assert response.status_code == 404
-    assert response.json["message"] == "A candidate with the given ID does not exist"
+    assert (
+        response.json["message"]
+        == "A candidate with the given ID does not exist"
+    )
 
     # Clear database after tests
     truncate_db_tables()
@@ -1140,10 +1174,10 @@ def test_election_get_all_candidates_by_election_id_unauthorized(client):
     # Initialize the data and model instances
     superuser_create()
     administrator_signup(client)
-    organization = organization_create()
+    organization_create()
     election = election_create()
     office_create()
-    candidate = candidate_create()
+    candidate_create()
 
     superuser = superuser_login(client)
 

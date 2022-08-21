@@ -11,7 +11,10 @@ from apiflask import APIBlueprint, abort
 from flask_jwt_extended import get_jwt_identity, jwt_required
 
 organization = APIBlueprint(
-    "organization", __name__, tag="Organization", url_prefix="/api/v1/organization"
+    "organization",
+    __name__,
+    tag="Organization",
+    url_prefix="/api/v1/organization",
 )
 
 

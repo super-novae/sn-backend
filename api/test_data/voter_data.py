@@ -53,7 +53,9 @@ def voter_create(seed=None) -> Voter:
 
 def voter_get_test_instance(seed) -> Voter:
     voter = voter_details_single(seed) if seed else voter_details_single(seed)
-    return Voter.query.filter_by(name=voter["name"], email=voter["email"]).first()
+    return Voter.query.filter_by(
+        name=voter["name"], email=voter["email"]
+    ).first()
 
 
 def voter_login_credentials(seed):
@@ -64,7 +66,9 @@ def voter_login_credentials(seed):
 
 
 def voter_login(client, seed):
-    response = client.post("/api/v1/voters/login", json=voter_login_credentials(seed))
+    response = client.post(
+        "/api/v1/voters/login", json=voter_login_credentials(seed)
+    )
 
     return response.json
 

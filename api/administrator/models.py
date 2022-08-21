@@ -11,7 +11,9 @@ load_dotenv()
 class Administrator(db.Model):
     __tablename__ = "sn_administrator"
 
-    id = db.Column(db.String(length=32), nullable=False, unique=True, primary_key=True)
+    id = db.Column(
+        db.String(length=32), nullable=False, unique=True, primary_key=True
+    )
     name = db.Column(db.String(length=80), nullable=False)
     username = db.Column(db.String(length=15), nullable=False, unique=True)
     email = db.Column(db.String(length=80), nullable=False, unique=True)

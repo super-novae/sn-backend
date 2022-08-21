@@ -1,5 +1,9 @@
 from sys import exc_info
-from .errors import CandidateDoesNotExist, ElectionDoesNotExist, OfficeDoesNotExist
+from .errors import (
+    CandidateDoesNotExist,
+    ElectionDoesNotExist,
+    OfficeDoesNotExist,
+)
 from .models import Candidate, Election, Office
 from .schema import (
     CandidateSchema,
@@ -176,7 +180,9 @@ def election_get_by_id_full_details(election_id):
     if not election:
         raise ElectionDoesNotExist
 
-    offices: List[Office] = Office.find_all_by_election_id(election_id=election_id)
+    offices: List[Office] = Office.find_all_by_election_id(
+        election_id=election_id
+    )
 
     office_candidate = []
 
@@ -419,7 +425,9 @@ def election_modify_candidate(election_id, candidate_id, data):
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
 
-    candidate = Candidate.find_candidate_by_id(id=candidate_id, election_id=election_id)
+    candidate = Candidate.find_candidate_by_id(
+        id=candidate_id, election_id=election_id
+    )
 
     if not candidate:
         raise CandidateDoesNotExist
@@ -458,7 +466,9 @@ def election_delete_candidate(election_id, candidate_id):
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
 
-    candidate = Candidate.find_candidate_by_id(id=candidate_id, election_id=election_id)
+    candidate = Candidate.find_candidate_by_id(
+        id=candidate_id, election_id=election_id
+    )
 
     if not candidate:
         raise CandidateDoesNotExist
@@ -493,7 +503,9 @@ def election_get_candidate_by_id(election_id, candidate_id):
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
 
-    candidate = Candidate.find_candidate_by_id(id=candidate_id, election_id=election_id)
+    candidate = Candidate.find_candidate_by_id(
+        id=candidate_id, election_id=election_id
+    )
 
     if not candidate:
         raise CandidateDoesNotExist
@@ -514,6 +526,8 @@ def election_get_all_candidates_by_election_id(election_id):
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
 
-    candidates = Candidate.find_all_candidates_by_election_id(election_id=election_id)
+    candidates = Candidate.find_all_candidates_by_election_id(
+        election_id=election_id
+    )
 
     return {"candidates": candidates}, 200

@@ -1,5 +1,3 @@
-from operator import eq
-import re
 from apiflask import Schema
 from apiflask.fields import String, Email, List, Nested
 from apiflask.validators import Length, Regexp
