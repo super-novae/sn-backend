@@ -22,6 +22,9 @@ migrate:
 	flask db migrate
 	flask db upgrade
 
+upgrade:
+	flask db upgrade
+
 test_admin:
 	pytest api/tests/test_admin.py --verbose
 
