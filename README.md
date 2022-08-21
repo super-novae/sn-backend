@@ -1,6 +1,9 @@
 # sn-backend
 Backend repo for voting system
 
+[![linting: pylint](https://img.shields.io/badge/linting-pylint-yellowgreen)](https://github.com/PyCQA/pylint)
+
+
 ## Backend Models
 https://dbdiagram.io/d/629c499b54ce2635275fd31d
 

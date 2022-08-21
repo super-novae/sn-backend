@@ -8,7 +8,7 @@ from faker import Faker
 from werkzeug.local import LocalProxy
 
 cors = CORS()
-db = SQLAlchemy()
+db = SQLAlchemy(session_options={"expire_on_commit": False})
 migrate = Migrate()
 bcrypt = Bcrypt()
 jwt = JWTManager()

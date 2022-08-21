@@ -24,7 +24,7 @@ def test_organization_create_successful(client):
         headers={"Authorization": f"Bearer {superuser['auth_token']}"},
     )
 
-    assert response.status_code == 200
+    assert response.status_code == 201
     assert response.json["id"][:4] == "org-"
 
     # Clear database after tests
@@ -100,7 +100,10 @@ def test_organization_modify_by_id_non_existent(client):
     )
 
     assert response.status_code == 404
-    assert response.json["message"] == "Organization with the given ID does not exists"
+    assert (
+        response.json["message"]
+        == "Organization with the given ID does not exists"
+    )
 
     # Clear database after tests
     truncate_db_tables()
@@ -178,7 +181,10 @@ def test_organization_delete_by_id_non_existent(client):
     )
 
     assert response.status_code == 404
-    assert response.json["message"] == "Organization with the given ID does not exists"
+    assert (
+        response.json["message"]
+        == "Organization with the given ID does not exists"
+    )
 
     # Clear database after tests
     truncate_db_tables()

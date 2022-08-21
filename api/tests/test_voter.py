@@ -1,5 +1,9 @@
 from api.test_data.admin_data import administrator_signup, administrator_login
-from api.test_data.election_data import candidate_create, election_create, office_create
+from api.test_data.election_data import (
+    candidate_create,
+    election_create,
+    office_create,
+)
 from api.test_data.organization_data import organization_create
 from api.test_data.superuser_data import superuser_create, superuser_login
 from api.test_data.voter_data import (
@@ -57,7 +61,7 @@ def test_voter_signup_voter_already_exists(client):
     administrator_signup(client)
     organization_create()
     election_create()
-    voter = voter_create(seed)
+    voter_create(seed)
     administrator = administrator_login(client)
 
     response = client.post(
@@ -68,7 +72,8 @@ def test_voter_signup_voter_already_exists(client):
 
     assert response.status_code == 409
     assert (
-        response.json["message"] == "A voter with the given credentials already exists"
+        response.json["message"]
+        == "A voter with the given credentials already exists"
     )
 
     # Clear database after tests
@@ -180,7 +185,9 @@ def test_voter_login_successful(client):
     election_create()
     voter = voter_create(seed)
 
-    response = client.post("/api/v1/voters/login", json=voter_login_credentials(seed))
+    response = client.post(
+        "/api/v1/voters/login", json=voter_login_credentials(seed)
+    )
 
     assert response.status_code == 200
     assert response.json["id"] == voter.id
@@ -202,7 +209,7 @@ def test_voter_login_voter_does_not_exist(client):
     administrator_signup(client)
     organization_create()
     election_create()
-    voter = voter_create(seed)
+    voter_create(seed)
 
     response = client.post(
         "/api/v1/voters/login", json=voter_login_credentials(seed + 1)
@@ -210,7 +217,8 @@ def test_voter_login_voter_does_not_exist(client):
 
     assert response.status_code == 400
     assert (
-        response.json["message"] == "A voter with the given credentials does not exist"
+        response.json["message"]
+        == "A voter with the given credentials does not exist"
     )
 
     # Clear database after tests
@@ -269,7 +277,9 @@ def test_voter_get_by_id_voter_does_not_exist(client):
     )
 
     assert response.status_code == 404
-    assert response.json["message"] == "A voter with the given Id does not exist"
+    assert (
+        response.json["message"] == "A voter with the given Id does not exist"
+    )
 
     # Clear database after tests
     truncate_db_tables()
@@ -322,7 +332,7 @@ def test_voter_get_all_successful(client):
     voter_create(seed)
 
     administrator = administrator_login(client)
-    voter = voter_login(client, seed)
+    voter_login(client, seed)
 
     response = client.get(
         f"/api/v1/voters/?organization_id={organization.id}",
@@ -352,7 +362,7 @@ def test_voter_get_all_unauthorized(client):
     voter_create(seed)
 
     superuser = superuser_login(client)
-    voter = voter_login(client, seed)
+    voter_login(client, seed)
 
     response = client.get(
         f"/api/v1/voters/?organization_id={organization.id}",
@@ -384,7 +394,7 @@ def test_voter_get_all_organization_not_found(client):
     voter_create(seed)
 
     administrator = administrator_login(client)
-    voter = voter_login(client, seed)
+    voter_login(client, seed)
 
     response = client.get(
         f"/api/v1/voters/?organization_id={organization.id[:4] + organization.id[4:][::-1]}",
@@ -392,7 +402,10 @@ def test_voter_get_all_organization_not_found(client):
     )
 
     assert response.status_code == 404
-    assert response.json["message"] == "Organization with the given ID does not exists"
+    assert (
+        response.json["message"]
+        == "Organization with the given ID does not exists"
+    )
 
     # Clear database after tests
     truncate_db_tables()
@@ -408,7 +421,7 @@ def test_voter_get_all_organization_id_not_provided(client):
     # Initialize the data and model instances
     superuser_create()
     administrator_signup(client)
-    organization = organization_create()
+    organization_create()
     election_create()
     voter_create(seed)
 
@@ -436,7 +449,7 @@ def test_voter_get_elections_successful(client):
     # Initialize the data and model instances
     superuser_create()
     administrator_signup(client)
-    organization = organization_create()
+    organization_create()
     election_create()
     voter_create(seed)
 
@@ -466,7 +479,7 @@ def test_voter_get_elections_unauthorized(client):
     # Initialize the data and model instances
     superuser_create()
     administrator_signup(client)
-    organization = organization_create()
+    organization_create()
     election_create()
     voter_create(seed)
 
@@ -572,7 +585,7 @@ def test_voter_cast_vote_voter_has_already_cast_vote(client):
     voter_create_vote(seed)
 
     voter = voter_login(client, seed)
-    administrator = administrator_login(client)
+    administrator_login(client)
 
     response = client.post(
         f"/api/v1/voters/{voter['id']}/vote",

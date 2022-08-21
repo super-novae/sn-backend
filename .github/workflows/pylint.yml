@@ -22,10 +22,6 @@ jobs:
       run: |
         pip install -r requirements.txt
         python -m pip install --upgrade pip
-    - name: Analysing the code with pylint
+    - name: Lint code
       run: |
-        pylint --disable=all --enable=unused-import $(git ls-files 'api/*.py')
-    - name: Perform code analysis with black
-      run: |
-        black --diff --check $(git ls-files 'api/*.py')
-
+        make lint

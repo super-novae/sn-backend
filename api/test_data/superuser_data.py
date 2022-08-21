@@ -36,7 +36,7 @@ def superuser_login_correct_credentials():
 
 
 def superuser_login_wrong_credentials():
-    return {"username": data["username"], "password": data["password"] + "goof"}
+    return {"username": data["username"], "password": data["password"][::-1]}
 
 
 def superuser_get():

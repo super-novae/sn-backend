@@ -1,7 +1,6 @@
 from .errors import (
     VoterDoesNotExist,
     VoterAlreadyExists,
-    VoterOrganizationIdNotProvided,
     VoterHasAlreadyVoted,
     VoterWrongCredentials,
 )
@@ -14,17 +13,26 @@ from .schema import (
     VoterGetAllInputSchema,
     VoteSchema,
 )
-from apiflask import APIBlueprint
+from apiflask import APIBlueprint, abort
 from api.election.models import Election
 from api.extensions import db, logger
-from api.generic.errors import UserDoesNotHaveRequiredRoles, InternalServerError
+from api.generic.errors import (
+    UserDoesNotHaveRequiredRoles,
+)
 from api.generic.methods import has_roles
 from api.generic.responses import GenericMessage
 from api.organization.errors import OrganizationNotFound
 from api.organization.models import Organization
-from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
+from flask_jwt_extended import (
+    create_access_token,
+    get_jwt_identity,
+    jwt_required,
+)
+from sys import exc_info
 
-voters = APIBlueprint("voter", __name__, tag="Voter", url_prefix="/api/v1/voters")
+voters = APIBlueprint(
+    "voter", __name__, tag="Voter", url_prefix="/api/v1/voters"
+)
 
 
 @voters.post("/signup")
@@ -66,6 +74,8 @@ def voter_signup(data):
 )
 @jwt_required()
 def voter_bulk_signup(data):
+    error = False
+
     user_has_required_roles = has_roles(["admin"], get_jwt_identity())
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
@@ -82,11 +92,19 @@ def voter_bulk_signup(data):
 
         db.session.commit()
 
-        return {"message": f"{total_number_of_voters} voters created successfully"}, 200
+    except Exception:
+        error = True
+        logger.warning(exc_info())
+        db.session.rollback()
+        abort(500)
 
-    except Exception as e:
-        logger.info(e)
-        raise InternalServerError
+    finally:
+        db.session.close()
+
+    if not error:
+        return {
+            "message": f"{total_number_of_voters} voters created successfully"
+        }, 200
 
 
 @voters.post("/login")
@@ -195,6 +213,8 @@ def voter_get_elections(voter_id):
 )
 @jwt_required()
 def voter_cast_vote(voter_id, data):
+    error = False
+
     user_has_required_roles = has_roles(["voter"], get_jwt_identity())
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
@@ -207,10 +227,21 @@ def voter_cast_vote(voter_id, data):
 
     vote = Vote(**data)
 
-    db.session.add(vote)
-    db.session.commit()
+    try:
+        db.session.add(vote)
+        db.session.commit()
 
-    return vote, 201
+    except Exception:
+        error = True
+        logger.warning(exc_info())
+        db.session.rollback()
+        abort(500)
+
+    finally:
+        db.session.close()
+
+    if not error:
+        return vote, 201
 
 
 # TODO: Implement voter logout

@@ -5,7 +5,9 @@ from secrets import token_hex
 class Election(db.Model):
     __tablename__ = "sn_election"
 
-    id = db.Column(db.String(length=32), nullable=False, unique=True, primary_key=True)
+    id = db.Column(
+        db.String(length=32), nullable=False, unique=True, primary_key=True
+    )
     name = db.Column(db.String(length=120), nullable=False, unique=True)
     route_name = db.Column(db.String(length=50), nullable=False, unique=True)
     type = db.Column(db.String(length=10), nullable=False)
@@ -53,7 +55,9 @@ class Office(db.Model):
     id = db.Column(db.String(length=32), nullable=False, primary_key=True)
     name = db.Column(db.String(length=60), nullable=False)
     route_name = db.Column(db.String(length=50), nullable=False)
-    election_id = db.Column(db.String(length=32), db.ForeignKey("sn_election.id"))
+    election_id = db.Column(
+        db.String(length=32), db.ForeignKey("sn_election.id")
+    )
 
     def __init__(self, name, route_name, election_id) -> None:
         self.id = f"off-{token_hex()[:28]}"
@@ -73,20 +77,30 @@ class Office(db.Model):
 class Candidate(db.Model):
     __tablename__ = "sn_candidate"
 
-    id = db.Column(db.String(length=32), nullable=False, unique=True, primary_key=True)
+    id = db.Column(
+        db.String(length=32), nullable=False, unique=True, primary_key=True
+    )
     name = db.Column(db.String(length=80), nullable=False, unique=True)
-    profile_image_url = db.Column(db.String(length=150), default="cand-default.jpg")
+    profile_image_url = db.Column(
+        db.String(length=150), default="cand-default.jpg"
+    )
     programme = db.Column(db.String(length=100), nullable=False)
     organization_id = db.Column(
         db.String(length=32), db.ForeignKey("sn_organization.id")
     )
-    election_id = db.Column(db.String(length=32), db.ForeignKey("sn_election.id"))
+    election_id = db.Column(
+        db.String(length=32), db.ForeignKey("sn_election.id")
+    )
     office_id = db.Column(db.String(length=32), db.ForeignKey("sn_office.id"))
 
-    def __init__(self, name, organization_id, programme, election_id, office_id):
+    def __init__(
+        self, name, organization_id, programme, election_id, office_id
+    ):
         self.id = f"cand-{token_hex()[:27]}"
         self.name = name
-        self.profile_image_url = f"https://url-to-s3-buckets/candidates/{self.id}"
+        self.profile_image_url = (
+            f"https://url-to-s3-buckets/candidates/{self.id}"
+        )
         self.programme = programme
         self.organization_id = organization_id
         self.election_id = election_id

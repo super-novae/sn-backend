@@ -16,7 +16,9 @@ def administrator_signup(client):
     response = client.post(
         "/api/v1/administrators/signup",
         json=administrator_signup_correct_credentials(),
-        headers={"Authorization": f"Bearer {logged_in_superuser['auth_token']}"},
+        headers={
+            "Authorization": f"Bearer {logged_in_superuser['auth_token']}"
+        },
     )
 
     return response.json
@@ -44,9 +46,14 @@ def administrator_signup_email_exists():
     }
 
 
+def administrator_modify():
+    return {"name": fake.name(), "username": fake.user_name()[:8]}
+
+
 def administrator_login(client):
     response = client.post(
-        "/api/v1/administrators/login", json=administrator_login_correct_credentials()
+        "/api/v1/administrators/login",
+        json=administrator_login_correct_credentials(),
     )
 
     return response.json

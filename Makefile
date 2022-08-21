@@ -4,6 +4,9 @@ create_env:
 	pip install -r requirements.txt
 
 check_coverage:
+	pytest --cov-config=.coveragerc --cov-report term-missing --cov=api --cov-fail-under=80
+
+generate coverage_report:
 	pytest --cov-config=.coveragerc --cov-report term-missing --cov-report html:test_coverage --cov=api --cov-fail-under=80
 
 # activate:
@@ -34,5 +37,5 @@ test_superuser:
 test_all: test_admin test_election test_organization test_superuser
 
 lint:
-	pylint --disable=all --enable=unused-import api/*.py
-	black --diff --check api/*.py
+	pylint --disable=all --enable=unused-import,unused-variable --score=yes api/
+	black --diff --check --color  --target-version py310 --line-length 79 api/

@@ -1,11 +1,29 @@
-from apiflask import APIBlueprint
-from flask_jwt_extended import jwt_required, create_access_token, get_jwt_identity
-from api.extensions import db
-from .errors import *
+from apiflask import APIBlueprint, abort
+from flask_jwt_extended import (
+    jwt_required,
+    create_access_token,
+    get_jwt_identity,
+)
+
+from ..generic.responses import GenericMessage
+from api.extensions import db, logger
+from .errors import (
+    AdministratorWithIdDoesNotExist,
+    AdministratorWithCredentialsDoesNotExist,
+    AdministratorWithEmailExists,
+    AdministratorWithUsernameExists,
+)
 from .models import Administrator
-from .schema import *
+from .schema import (
+    AdministratorSchema,
+    AdministratorsSchema,
+    AdministratorLoginInputSchema,
+    AdministratorLoginOutputSchema,
+    AdministratorModifySchema,
+)
 from api.generic.methods import has_roles
-from api.generic.errors import *
+from api.generic.errors import UserDoesNotHaveRequiredRoles
+from sys import exc_info
 
 # Initiate module blueprint
 administrator = APIBlueprint(
@@ -18,15 +36,16 @@ administrator = APIBlueprint(
 
 @administrator.post("/signup")
 @administrator.input(AdministratorSchema)
-@administrator.output(AdministratorSchema)
+@administrator.output(AdministratorSchema, status_code=201)
 @administrator.doc(
     summary="Administrator Sign Up",
     description="An endpoint for the creation of administrators",
-    responses=[200, 409],
+    responses=[201, 403, 409],
 )
 @jwt_required()
 def administrator_sign_up(data):
-    # Perform security checks
+    error = False
+
     user_has_required_roles = has_roles(["super"], get_jwt_identity())
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
@@ -45,11 +64,111 @@ def administrator_sign_up(data):
     admin = Administrator(**data)
     admin.password = data["password"]
 
-    # Commit to database
-    db.session.add(admin)
-    db.session.commit()
+    try:
+        # Commit to database
+        db.session.add(admin)
+        db.session.commit()
 
-    return admin
+    except Exception:
+        error = True
+        logger.warning(exc_info())
+        db.session.rollback()
+        abort(500)
+
+    finally:
+        db.session.close()
+
+    if not error:
+        return admin, 201
+
+
+@administrator.put("/<admin_id>")
+@administrator.input(AdministratorModifySchema)
+@administrator.output(GenericMessage)
+@administrator.doc(
+    summary="Administrator Modify By Id",
+    description="An endpoint to modify an administrator by id",
+    responses=[200, 403, 404],
+)
+@jwt_required()
+def administrator_modify(admin_id, data):
+    error = False
+
+    user_has_required_roles = has_roles(["super"], get_jwt_identity())
+    if not user_has_required_roles:
+        raise UserDoesNotHaveRequiredRoles
+
+    admin = Administrator.find_by_id(admin_id)
+    if not admin:
+        raise AdministratorWithIdDoesNotExist
+
+    # Checking if admin with the same email exists
+    if data.get("email", None):
+        admin_email_exists = Administrator.find_by_email(data["email"])
+        if admin_email_exists:
+            raise AdministratorWithEmailExists
+
+    # Check if admin with the same username exists
+    if data.get("username", None):
+        admin_username_exists = Administrator.find_by_username(
+            data["username"]
+        )
+        if admin_username_exists:
+            raise AdministratorWithUsernameExists
+
+    for attribute, value in data.items():
+        setattr(admin, attribute, value)
+
+    try:
+        db.session.commit()
+
+    except Exception:
+        error = True
+        logger.warning(exc_info())
+        db.session.rollback()
+        abort(500)
+
+    finally:
+        db.session.close()
+
+    if not error:
+        return {"message": "Administrator modified successfully"}, 200
+
+
+@administrator.delete("/<admin_id>")
+@administrator.output(GenericMessage)
+@administrator.doc(
+    summary="Administrator Delete",
+    description="An endpoint for the deletion of an administrator",
+    responses=[200, 403, 404],
+)
+@jwt_required()
+def administrator_delete(admin_id):
+    error = False
+
+    user_has_required_roles = has_roles(["super"], get_jwt_identity())
+    if not user_has_required_roles:
+        raise UserDoesNotHaveRequiredRoles
+
+    admin = Administrator.find_by_id(admin_id)
+    if not admin:
+        raise AdministratorWithIdDoesNotExist
+
+    try:
+        db.session.delete(admin)
+        db.session.commit()
+
+    except Exception:
+        error = True
+        logger.warning(exc_info())
+        db.session.rollback()
+        abort(500)
+
+    finally:
+        db.session.close()
+
+    if not error:
+        return {"message": "Administrator deleted successfully"}, 200
 
 
 @administrator.post("/login")
@@ -85,7 +204,7 @@ def administrator_get_all():
 
     admins = Administrator.get_all()
 
-    return {"administrators": admins}
+    return {"administrators": admins}, 200
 
 
 @administrator.get("/<admin_id>")
