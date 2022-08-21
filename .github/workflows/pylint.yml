@@ -29,9 +29,6 @@ jobs:
   test:
     needs: lint
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.10"]
     services:
       postgres:
         image: postgres:latest
@@ -49,10 +46,11 @@ jobs:
           --health-retries 5
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.10"
 
       - name: Install dependencies
         run: |
@@ -66,6 +64,8 @@ jobs:
           DEV_DATABASE_URL: 'postgresql://postgres:test_password@postgres:5432/supernovae_test_db'
           DATABASE_URL: 'postgresql://postgres:test_password@postgres:5432/supernovae_test_db'
           FLASK_APP: run.py
+          FLASK_ENV: test
+          SECRET_KEY: c66c06f21325e29eda5f5664dc9816d2d21e36f16062d7c7f76d1ddfb9757ffc
       
       - name: Run tests
         run: make test_all
