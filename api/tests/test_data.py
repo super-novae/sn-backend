@@ -11,7 +11,6 @@ from ..test_data.voter_data import (
     voter_create,
     voter_login,
     voter_create_vote,
-    voter_vote_details,
 )
 from random import randint
 
@@ -41,7 +40,7 @@ def test_data_get_election_results(client):
     )
 
     assert response.status_code == 200
-    assert response.json['results']
-    
+    assert response.json["results"]
+
     # Clear database after tests
     truncate_db_tables()
