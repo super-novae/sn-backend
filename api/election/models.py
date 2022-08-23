@@ -16,6 +16,12 @@ class Election(db.Model):
     organization_id = db.Column(
         db.String(length=32), db.ForeignKey("sn_organization.id")
     )
+    candidates = db.relationship(
+        "Candidate", backref="election", lazy="joined", cascade="all, delete"
+    )
+    offices = db.relationship(
+        "Office", backref="election", lazy="joined", cascade="all, delete"
+    )
 
     def __init__(
         self, name, route_name, type, organization_id, college="", programme=""
@@ -45,6 +51,12 @@ class Election(db.Model):
         return cls.query.filter_by(programme=programme).all()
 
     @classmethod
+    def find_by_id_and_organization_id(cls, id, organization_id):
+        return cls.query.filter_by(
+            id=id, organization_id=organization_id
+        ).first()
+
+    @classmethod
     def find_all_elections_by_organization_id(cls, organization_id):
         return cls.query.filter_by(organization_id=organization_id).all()
 
@@ -57,6 +69,9 @@ class Office(db.Model):
     route_name = db.Column(db.String(length=50), nullable=False)
     election_id = db.Column(
         db.String(length=32), db.ForeignKey("sn_election.id")
+    )
+    candidates = db.relationship(
+        "Candidate", backref="office", lazy="joined", cascade="all, delete"
     )
 
     def __init__(self, name, route_name, election_id) -> None:
@@ -92,6 +107,9 @@ class Candidate(db.Model):
         db.String(length=32), db.ForeignKey("sn_election.id")
     )
     office_id = db.Column(db.String(length=32), db.ForeignKey("sn_office.id"))
+    votes = db.relationship(
+        "Vote", backref="candidate", lazy="joined", cascade="all, delete"
+    )
 
     def __init__(
         self, name, organization_id, programme, election_id, office_id

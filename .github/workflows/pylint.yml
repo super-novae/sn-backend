@@ -1,27 +1,98 @@
-name: Black & Pylint
+name: CI Pipeline
 
 on: 
   push:
-    branches: [ "main" ]
+    branches: [ "main", "dev" ]
   pull_request:
     types: [edited, opened, reopened]
 
 jobs:
-  build:
+  lint:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.10"]
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
+
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: "3.10"
+
     - name: Install dependencies
       run: |
         pip install -r requirements.txt
         python -m pip install --upgrade pip
+
     - name: Lint code
       run: |
         make lint
+  
+  vulnerability-assessment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          python -m pip install --upgrade pip
+      
+      - name: Perform vulnerability assessment with pip-audit
+        run: |
+          make vulnerability-assessment
+    
+
+  test:
+    needs: [lint, vulnerability-assessment]
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: supernovae_test_db
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_PORT: 5432
+          POSTGRES_USER: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          python -m pip install --upgrade pip
+
+      - name: Apply migrations to database
+        run: make upgrade
+        env: 
+          TEST_DATABASE_URL: 'postgresql://postgres:test_password@localhost:5432/supernovae_test_db'
+          DEV_DATABASE_URL: 'postgresql://postgres:test_password@localhost:5432/supernovae_test_db'
+          DATABASE_URL: 'postgresql://postgres:test_password@localhost:5432/supernovae_test_db'
+          FLASK_APP: run.py
+          FLASK_ENV: test
+          SECRET_KEY: c66c06f21325e29eda5f5664dc9816d2d21e36f16062d7c7f76d1ddfb9757ffc
+      
+      - name: Run tests
+        run: make test_all
+        env:
+          TEST_DATABASE_URL: 'postgresql://postgres:test_password@localhost:5432/supernovae_test_db'
+          DEV_DATABASE_URL: 'postgresql://postgres:test_password@localhost:5432/supernovae_test_db'
+          DATABASE_URL: 'postgresql://postgres:test_password@localhost:5432/supernovae_test_db'
+          FLASK_APP: run.py
+          FLASK_ENV: test
+          SECRET_KEY: c66c06f21325e29eda5f5664dc9816d2d21e36f16062d7c7f76d1ddfb9757ffc

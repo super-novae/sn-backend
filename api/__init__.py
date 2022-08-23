@@ -8,6 +8,7 @@ from .administrator.controllers import administrator
 from .organization.controllers import organization
 from .election.controllers import election
 from .voter.controllers import voters
+from .data.controllers import data
 
 # Load environment variables
 load_dotenv()
@@ -34,5 +35,6 @@ def create_app():
     app.register_blueprint(organization)
     app.register_blueprint(election)
     app.register_blueprint(voters)
+    app.register_blueprint(data)
 
     return app
