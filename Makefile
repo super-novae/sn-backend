@@ -31,6 +31,9 @@ vulnerability-assessment:
 test_admin:
 	pytest api/tests/test_admin.py --verbose
 
+test_data:
+	pytest api/tests/test_data.py --verbose
+
 test_election:
 	pytest api/tests/test_election.py --verbose
 
@@ -40,7 +43,7 @@ test_organization:
 test_superuser:
 	pytest api/tests/test_superuser.py --verbose
 
-test_all: test_admin test_election test_organization test_superuser
+test_all: test_admin test_admin test_election test_organization test_superuser
 
 lint:
 	pylint --disable=all --enable=unused-import,unused-variable --score=yes api/
