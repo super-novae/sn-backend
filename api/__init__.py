@@ -9,6 +9,7 @@ from .organization.controllers import organization
 from .election.controllers import election
 from .voter.controllers import voters
 from .data.controllers import data
+from flask import redirect
 
 # Load environment variables
 load_dotenv()
@@ -28,6 +29,12 @@ def create_app():
     bcrypt.init_app(app=app)
     jwt.init_app(app=app)
     migrate.init_app(app=app, db=db, compare_type=True)
+
+    # Redirect to docs
+    @app.get("/")
+    def redirect_to_docs():
+        return redirect('/docs')
+        
 
     # Register blueprints for the application
     app.register_blueprint(superuser)
