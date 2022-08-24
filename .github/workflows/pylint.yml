@@ -98,7 +98,7 @@ jobs:
           SECRET_KEY: c66c06f21325e29eda5f5664dc9816d2d21e36f16062d7c7f76d1ddfb9757ffc
 
   deploy-to-heroku:
-    needs: vulnerability-assessment
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
