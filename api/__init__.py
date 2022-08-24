@@ -33,7 +33,7 @@ def create_app():
     # Redirect to docs
     @app.get("/")
     def redirect_to_docs():
-        return redirect('/docs')
+        return redirect("/docs")
         
 
     # Register blueprints for the application
