@@ -34,7 +34,6 @@ def create_app():
     @app.get("/")
     def redirect_to_docs():
         return redirect("/docs")
-        
 
     # Register blueprints for the application
     app.register_blueprint(superuser)
