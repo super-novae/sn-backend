@@ -48,3 +48,9 @@ test_all: test_admin test_admin test_election test_organization test_superuser
 lint:
 	pylint --disable=all --enable=unused-import,unused-variable --score=yes api/
 	black --diff --check --color  --target-version py310 --line-length 79 api/
+
+docker-build:
+	docker image build --file=./Dockerfile --tag=rising2392:sn-backend-api .
+
+docker-run-local:
+	docker container run -d --name sn-backend-api -p 8000:8000 --env-file .env rising2392:sn-backend-api
