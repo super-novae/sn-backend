@@ -13,9 +13,6 @@ class SuperuserLoginSchema(Schema):
         required=True,
         validate=[
             Length(min=8, max=16),
-            Regexp(
-                "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+-=])[A-Za-z\d!@#$%^&*()_+-=]{8,}$"
-            ),
         ],
         metadata={
             "description": """
@@ -26,3 +23,7 @@ class SuperuserLoginSchema(Schema):
             """
         },
     )
+
+# Regexp(
+#     "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+-=])[A-Za-z\d!@#$%^&*()_+-=]{8,}$"
+# ),
