@@ -1,0 +1,12 @@
+__pycache__/
+.circleci/
+.github/
+.pytest_cache/
+env/
+scripts/
+target/
+test_coverage/
+.coverage/
+.coveragerc
+.env
+todo.txt

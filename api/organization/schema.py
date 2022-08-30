@@ -1,5 +1,5 @@
 from apiflask import Schema
-from apiflask.fields import String
+from apiflask.fields import String, Nested
 from apiflask.validators import Length, Regexp
 
 
@@ -13,3 +13,7 @@ class OrganizationSchema(Schema):
 
 class OrganizationModifySchema(Schema):
     name = String(required=True, validate=[Length(4, 256)])
+
+
+class OrganizationsSchema(Schema):
+    organizations = Nested(OrganizationSchema)

@@ -20,7 +20,7 @@ class Administrator(db.Model):
     date_created = db.Column(db.DateTime(), nullable=False)
     password_hash = db.Column(db.String(length=130), nullable=False)
 
-    def __init__(self, name, username, email, password):
+    def __init__(self, name, username, email, password=None):
         self.id = f"admin-{token_urlsafe()[:26]}"
         self.name = name
         self.username = username

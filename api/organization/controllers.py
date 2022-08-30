@@ -3,6 +3,8 @@ from sys import exc_info
 from .models import Organization
 from .schema import OrganizationSchema, OrganizationModifySchema
 from .errors import OrganizationNotFound
+from api.administrator.schema import AdministratorSchema
+from api.administrator.models import Administrator
 from api.extensions import db, logger
 from api.generic.methods import has_roles
 from api.generic.errors import UserDoesNotHaveRequiredRoles
@@ -128,3 +130,46 @@ def organization_delete_by_id(id):
                 "message": f"Organization <{organization.id}> deleted successfully."
             }, 200
     raise OrganizationNotFound
+
+
+@organization.get("/<id>")
+@organization.output(OrganizationSchema)
+@organization.doc(
+    summary="Organization Get By Id",
+    description="An endpoint for the deletion of an organization",
+    responses=[200, 403, 404],
+)
+@jwt_required()
+def organization_get_by_id(id):
+    user_has_required_roles = has_roles(["super"], get_jwt_identity())
+    if not user_has_required_roles:
+        raise UserDoesNotHaveRequiredRoles
+
+    organization = Organization.find_by_id(id)
+
+    if not organization:
+        raise OrganizationNotFound
+
+    return organization, 200
+
+
+@organization.get("/<id>/administrator")
+@organization.output(AdministratorSchema)
+@organization.doc(
+    summary="Organization Get Administrators By Id",
+    description="An endpoint for the deletion of an organization",
+    responses=[200, 403, 404],
+)
+@jwt_required()
+def organization_get_administrator(id):
+    user_has_required_roles = has_roles(["super"], get_jwt_identity())
+    if not user_has_required_roles:
+        raise UserDoesNotHaveRequiredRoles
+
+    organization = Organization.find_by_id(id)
+    if not organization:
+        raise OrganizationNotFound
+
+    administrator = Administrator.find_by_id(organization.administrator_id)
+
+    return administrator, 200
