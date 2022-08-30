@@ -202,7 +202,6 @@ def test_organization_delete_by_id_not_authorized(client):
 
     response = client.delete(
         f"/api/v1/organization/{organization.id}",
-        json=organization_modified_details(),
         headers={"Authorization": f"Bearer {administrator['auth_token']}"},
     )
 
@@ -214,3 +213,135 @@ def test_organization_delete_by_id_not_authorized(client):
 
     # Clear database after tests
     truncate_db_tables()
+
+
+def test_organization_get_by_id_successful(client):
+    # Remove all data from database
+    truncate_db_tables()
+
+    # Initialize data and model instances
+    superuser_create()
+    administrator_signup(client)
+    organization = organization_create()
+    superuser = superuser_login(client)
+
+    response = client.get(
+        f"/api/v1/organization/{organization.id}",
+        headers={"Authorization": f"Bearer {superuser['auth_token']}"},
+    )
+
+    assert response.status_code == 200
+    assert response.json["administrator_id"]
+    assert response.json["id"]
+    assert response.json["name"]
+
+
+def test_organization_get_by_id_not_authorized(client):
+    # Remove all data from database
+    truncate_db_tables()
+
+    # Initialize data and model instances
+    superuser_create()
+    administrator_signup(client)
+    organization = organization_create()
+    administrator = administrator_login(client)
+
+    response = client.get(
+        f"/api/v1/organization/{organization.id}",
+        headers={"Authorization": f"Bearer {administrator['auth_token']}"},
+    )
+
+    assert response.status_code == 403
+    assert (
+        response.json["message"]
+        == "User does not have the required permissions to perform action"
+    )
+
+
+def test_organization_get_by_id_not_found(client):
+    # Remove all data from database
+    truncate_db_tables()
+
+    # Initialize data and model instances
+    superuser_create()
+    administrator_signup(client)
+    organization = organization_create()
+    superuser = superuser_login(client)
+
+    response = client.get(
+        f"/api/v1/organization/{organization.id[::-1]}",
+        headers={"Authorization": f"Bearer {superuser['auth_token']}"},
+    )
+
+    assert response.status_code == 404
+    assert (
+        response.json["message"]
+        == "Organization with the given ID does not exists"
+    )
+
+
+def test_organization_get_administrator_successful(client):
+    # Remove all data from database
+    truncate_db_tables()
+
+    # Initialize data and model instances
+    superuser_create()
+    administrator_signup(client)
+    organization = organization_create()
+    superuser = superuser_login(client)
+
+    response = client.get(
+        f"/api/v1/organization/{organization.id}/administrator",
+        headers={"Authorization": f"Bearer {superuser['auth_token']}"},
+    )
+
+    assert response.status_code == 200
+    assert response.json["email"]
+    assert response.json["id"]
+    assert response.json["name"]
+    assert response.json["username"]
+
+
+def test_organization_get_administrator_not_authorized(client):
+    # Remove all data from database
+    truncate_db_tables()
+
+    # Initialize data and model instances
+    superuser_create()
+    administrator_signup(client)
+    organization = organization_create()
+    administrator = administrator_login(client)
+
+    response = client.get(
+        f"/api/v1/organization/{organization.id}/administrator",
+        headers={"Authorization": f"Bearer {administrator['auth_token']}"},
+    )
+
+    assert response.status_code == 403
+    assert (
+        response.json["message"]
+        == "User does not have the required permissions to perform action"
+    )
+
+
+
+def test_organization_get_administrator_not_found(client):
+    # Remove all data from database
+    truncate_db_tables()
+
+    # Initialize data and model instances
+    superuser_create()
+    administrator_signup(client)
+    organization = organization_create()
+    superuser = superuser_login(client)
+
+    response = client.get(
+        f"/api/v1/organization/{organization.id[::-1]}/administrator",
+        headers={"Authorization": f"Bearer {superuser['auth_token']}"},
+    )
+
+    assert response.status_code == 404
+    assert (
+        response.json["message"]
+        == "Organization with the given ID does not exists"
+    )
