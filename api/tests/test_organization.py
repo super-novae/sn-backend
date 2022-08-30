@@ -324,7 +324,6 @@ def test_organization_get_administrator_not_authorized(client):
     )
 
 
-
 def test_organization_get_administrator_not_found(client):
     # Remove all data from database
     truncate_db_tables()
