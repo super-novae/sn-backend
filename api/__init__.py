@@ -25,6 +25,7 @@ def create_app():
 
     # Load extensions
     cors.init_app(app=app)
+    mail.init_app(app=app)
     db.init_app(app=app)
     bcrypt.init_app(app=app)
     jwt.init_app(app=app)
