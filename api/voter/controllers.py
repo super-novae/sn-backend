@@ -8,6 +8,7 @@ from .models import Voter, Vote
 from .schema import (
     VoterElections,
     VoterLoginInputSchema,
+    VoterRecoverAccountSchema,
     VoterSchema,
     VotersSchema,
     VoterGetAllInputSchema,
@@ -16,10 +17,13 @@ from .schema import (
 from apiflask import APIBlueprint, abort
 from api.election.models import Election
 from api.extensions import db, logger
+from api.generic.db import save, modify
 from api.generic.errors import (
     UserDoesNotHaveRequiredRoles,
 )
+from api.generic.mail import send_password_to_voter
 from api.generic.methods import has_roles
+from api.generic.password import generate_voter_password
 from api.generic.responses import GenericMessage
 from api.organization.errors import OrganizationNotFound
 from api.organization.models import Organization
@@ -56,7 +60,12 @@ def voter_signup(data):
         raise VoterAlreadyExists
 
     voter = Voter(**data)
-    voter.password = data["password"]
+
+    password = generate_voter_password()
+
+    voter.password = password
+
+    send_password_to_voter(data["email"], data["name"], password)
 
     db.session.add(voter)
     db.session.commit()
@@ -85,10 +94,13 @@ def voter_bulk_signup(data):
     try:
         for _, details in enumerate(data["voters"]):
             voter = Voter(**details)
-            voter.password = details["password"]
+            password = generate_voter_password()
+            voter.password = password
 
             db.session.add(voter)
             db.session.flush()
+
+            send_password_to_voter(details["email"], details["name"], password)
 
         db.session.commit()
 
@@ -208,13 +220,11 @@ def voter_get_elections(voter_id):
 @voters.output(VoteSchema)
 @voters.doc(
     summary="Voter Cast Vote",
-    description="An endpoint for the voter to cast his vote in a mini election",
+    description="An endpoint for the voter to cast his vote in an election",
     responses=[201, 400, 403],
 )
 @jwt_required()
 def voter_cast_vote(voter_id, data):
-    error = False
-
     user_has_required_roles = has_roles(["voter"], get_jwt_identity())
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
@@ -227,18 +237,7 @@ def voter_cast_vote(voter_id, data):
 
     vote = Vote(**data)
 
-    try:
-        db.session.add(vote)
-        db.session.commit()
-
-    except Exception:
-        error = True
-        logger.warning(exc_info())
-        db.session.rollback()
-        abort(500)
-
-    finally:
-        db.session.close()
+    vote, error = save(vote)
 
     if not error:
         return vote, 201
@@ -252,3 +251,26 @@ def voter_cast_vote(voter_id, data):
 
 
 # TODO: [Future] Update Bulk Student Data
+
+
+@voters.post("/password_reset")
+@voters.input(VoterRecoverAccountSchema)
+@voters.output(GenericMessage)
+@voters.doc(
+    summary="Voter Reset Password",
+    description="An endpoint for the voter to reset her/his password",
+    responses=[200, 400],
+)
+def voter_reset_password(data):
+    voter = Voter.find_by_email(data["email"])
+    if not voter:
+        raise VoterDoesNotExist
+
+    new_password = generate_voter_password()
+    voter.password = new_password
+    voter, error = modify(voter)
+
+    send_password_to_voter(voter.email, voter.name, new_password)
+
+    if not error:
+        return {"message": "A new password will be sent if the email exists"}

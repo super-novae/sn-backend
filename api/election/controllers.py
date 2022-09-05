@@ -1,4 +1,3 @@
-from sys import exc_info
 from .errors import (
     CandidateDoesNotExist,
     ElectionDoesNotExist,
@@ -16,13 +15,12 @@ from .schema import (
     OfficesSchema,
     OfficeUpdateSchema,
 )
-from api.extensions import db, logger
-from apiflask import APIBlueprint, abort
+from apiflask import APIBlueprint
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from api.generic.errors import UserDoesNotHaveRequiredRoles
-from api.generic.methods import has_roles
+from api.generic.db import delete, modify, save
+from api.generic.methods import has_roles, security_headers
 from api.generic.responses import GenericMessage
-from sys import exc_info
 from typing import List
 
 election = APIBlueprint(
@@ -40,29 +38,16 @@ election = APIBlueprint(
 )
 @jwt_required()
 def election_create(data):
-    error = False
-
     user_has_required_roles = has_roles(["admin"], get_jwt_identity())
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
 
     election = Election(**data)
 
-    try:
-        db.session.add(election)
-        db.session.commit()
-
-    except Exception:
-        error = True
-        logger.warning(exc_info())
-        db.session.rollback()
-        abort(500)
-
-    finally:
-        db.session.close()
+    election, error = save(election)
 
     if not error:
-        return election, 201
+        return election, 201, security_headers
 
 
 @election.put("/<election_id>")
@@ -75,8 +60,6 @@ def election_create(data):
 )
 @jwt_required()
 def election_modify(election_id, data):
-    error = False
-
     user_has_required_roles = has_roles(["admin"], get_jwt_identity())
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
@@ -89,17 +72,7 @@ def election_modify(election_id, data):
     for attribute, value in data.items():
         setattr(election, attribute, value)
 
-    try:
-        db.session.commit()
-
-    except Exception:
-        error = True
-        logger.warning(exc_info())
-        db.session.rollback()
-        abort(500)
-
-    finally:
-        db.session.close()
+    election, error = modify(election)
 
     if not error:
         return {"message": "Election modified successfully"}, 200
@@ -125,18 +98,7 @@ def election_delete(election_id):
     if not election:
         raise ElectionDoesNotExist
 
-    try:
-        db.session.delete(election)
-        db.session.commit()
-
-    except Exception:
-        error = True
-        logger.warning(exc_info())
-        db.session.rollback()
-        abort(500)
-
-    finally:
-        db.session.close()
+    election, error = delete(election)
 
     if not error:
         return {"message": "Election deleted successfully"}, 200
@@ -233,26 +195,13 @@ def election_get_all_by_organization_id(organization_id):
 )
 @jwt_required()
 def election_create_office(election_id, data):
-    error = False
-
     user_has_required_roles = has_roles(["admin"], get_jwt_identity())
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
 
     office = Office(**data)
 
-    try:
-        db.session.add(office)
-        db.session.commit()
-
-    except Exception:
-        error = True
-        logger.warning(exc_info())
-        db.session.rollback()
-        abort(500)
-
-    finally:
-        db.session.close()
+    office, error = save(office)
 
     if not error:
         return office, 201
@@ -282,17 +231,7 @@ def election_modify_office(election_id, office_id, data):
     for attribute, value in data.items():
         setattr(office, attribute, value)
 
-    try:
-        db.session.commit()
-
-    except Exception:
-        error = True
-        logger.warning(exc_info())
-        db.session.rollback()
-        abort(500)
-
-    finally:
-        db.session.close()
+    office, error = modify(office)
 
     if not error:
         return {"message": "Office modified successfully"}, 200
@@ -318,18 +257,7 @@ def election_delete_office(election_id, office_id):
     if not office:
         raise OfficeDoesNotExist
 
-    try:
-        db.session.delete(office)
-        db.session.commit()
-
-    except Exception:
-        error = True
-        logger.warning(exc_info())
-        db.session.rollback()
-        abort(500)
-
-    finally:
-        db.session.close()
+    office, error = delete(office)
 
     if not error:
         return {"message": "Office deleted successfully"}, 200
@@ -384,26 +312,13 @@ def election_get_all_offices_by_election_id(election_id):
 )
 @jwt_required()
 def election_create_candidate(election_id, data):
-    error = False
-
     user_has_required_roles = has_roles(["admin"], get_jwt_identity())
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
 
     candidate = Candidate(**data)
 
-    try:
-        db.session.add(candidate)
-        db.session.commit()
-
-    except Exception:
-        error = True
-        logger.warning(exc_info())
-        db.session.rollback()
-        abort(500)
-
-    finally:
-        db.session.close()
+    candidate, error = save(candidate)
 
     if not error:
         return candidate, 201
@@ -419,8 +334,6 @@ def election_create_candidate(election_id, data):
 )
 @jwt_required()
 def election_modify_candidate(election_id, candidate_id, data):
-    error = False
-
     user_has_required_roles = has_roles(["admin"], get_jwt_identity())
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
@@ -435,17 +348,7 @@ def election_modify_candidate(election_id, candidate_id, data):
     for attribute, value in data.items():
         setattr(candidate, attribute, value)
 
-    try:
-        db.session.commit()
-
-    except Exception:
-        error = True
-        logger.warning(exc_info())
-        db.session.rollback()
-        abort(500)
-
-    finally:
-        db.session.close()
+    candidate, error = modify(candidate)
 
     if not error:
         return {"message": "Candidate modified successfully"}, 200
@@ -460,8 +363,6 @@ def election_modify_candidate(election_id, candidate_id, data):
 )
 @jwt_required()
 def election_delete_candidate(election_id, candidate_id):
-    error = False
-
     user_has_required_roles = has_roles(["admin"], get_jwt_identity())
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
@@ -473,18 +374,7 @@ def election_delete_candidate(election_id, candidate_id):
     if not candidate:
         raise CandidateDoesNotExist
 
-    try:
-        db.session.delete(candidate)
-        db.session.commit()
-
-    except Exception:
-        error = True
-        logger.warning(exc_info())
-        db.session.rollback()
-        abort(500)
-
-    finally:
-        db.session.close()
+    candidate, error = delete(candidate)
 
     if not error:
         return {"message": "Candidate deleted successfully"}, 200
