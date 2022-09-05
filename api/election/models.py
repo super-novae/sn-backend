@@ -12,7 +12,7 @@ class Election(db.Model):
     route_name = db.Column(db.String(length=50), nullable=False, unique=True)
     type = db.Column(db.String(length=10), nullable=False)
     college = db.Column(db.String(length=100), nullable=True)
-    programme = db.Column(db.String(length=10), nullable=True)
+    programme = db.Column(db.String(length=100), nullable=True)
     organization_id = db.Column(
         db.String(length=32), db.ForeignKey("sn_organization.id")
     )
@@ -44,11 +44,13 @@ class Election(db.Model):
 
     @classmethod
     def find_by_college(cls, college):
-        return cls.query.filter_by(college=college).all()
+        return cls.query.filter_by(college=college, type="College").all()
 
     @classmethod
     def find_by_programme(cls, programme):
-        return cls.query.filter_by(programme=programme).all()
+        return cls.query.filter_by(
+            programme=programme, type="Department"
+        ).all()
 
     @classmethod
     def find_by_id_and_organization_id(cls, id, organization_id):
