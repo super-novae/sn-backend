@@ -34,7 +34,9 @@ def voter_details_multiple():
     voters = []
 
     for _ in range(5):
-        voters.append(voter_details_single())
+        voter = voter_details_single()
+        voter.pop("password")
+        voters.append(voter)
 
     return voters
 

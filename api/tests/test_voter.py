@@ -29,7 +29,9 @@ def test_voter_signup_successful(client):
     administrator_signup(client)
     organization_create()
     election_create()
+
     voter = voter_details_single()
+    voter.pop("password")
 
     administrator = administrator_login(client)
 
@@ -64,9 +66,12 @@ def test_voter_signup_voter_already_exists(client):
     voter_create(seed)
     administrator = administrator_login(client)
 
+    voter_details = voter_details_single(seed)
+    voter_details.pop("password")
+
     response = client.post(
         "/api/v1/voters/signup",
-        json=voter_details_single(seed),
+        json=voter_details,
         headers={"Authorization": f"Bearer {administrator['auth_token']}"},
     )
 
@@ -89,7 +94,9 @@ def test_voter_signup_unauthorized(client):
     administrator_signup(client)
     organization_create()
     election_create()
+
     voter = voter_details_single()
+    voter.pop("password")
 
     superuser = superuser_login(client)
 
