@@ -7,6 +7,8 @@ from flask_jwt_extended import (
 
 from ..generic.responses import GenericMessage
 from ..generic.db import delete, save, modify
+from ..generic.password import generate_password
+from ..generic.mail import send_password_to_admin
 from .errors import (
     AdministratorWithIdDoesNotExist,
     AdministratorWithCredentialsDoesNotExist,
@@ -59,7 +61,11 @@ def administrator_sign_up(data):
 
     # Create admin instance
     admin = Administrator(**data)
-    admin.password = data["password"]
+    password = generate_password()
+
+    admin.password = password
+
+    send_password_to_admin(admin.email, admin.name, password)
 
     admin, error = save(admin)
 
