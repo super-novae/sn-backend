@@ -23,7 +23,7 @@ from api.generic.errors import (
 )
 from api.generic.mail import send_password_to_voter
 from api.generic.methods import has_roles
-from api.generic.password import generate_voter_password
+from api.generic.password import generate_password
 from api.generic.responses import GenericMessage
 from api.organization.errors import OrganizationNotFound
 from api.organization.models import Organization
@@ -61,7 +61,7 @@ def voter_signup(data):
 
     voter = Voter(**data)
 
-    password = generate_voter_password()
+    password = generate_password()
 
     voter.password = password
 
@@ -94,7 +94,7 @@ def voter_bulk_signup(data):
     try:
         for _, details in enumerate(data["voters"]):
             voter = Voter(**details)
-            password = generate_voter_password()
+            password = generate_password()
             voter.password = password
 
             db.session.add(voter)
@@ -266,7 +266,7 @@ def voter_reset_password(data):
     if not voter:
         raise VoterDoesNotExist
 
-    new_password = generate_voter_password()
+    new_password = generate_password()
     voter.password = new_password
     voter, error = modify(voter)
 
