@@ -1,6 +1,7 @@
 import pytest
 from api import create_app
 from api.config import config_dict
+import random
 
 
 @pytest.fixture
@@ -14,3 +15,7 @@ def app():
 @pytest.fixture
 def client(app):
     yield app.test_client()
+
+@pytest.fixture
+def seed(app):
+    yield random.randint(100, 500)
