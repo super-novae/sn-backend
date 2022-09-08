@@ -9,15 +9,14 @@ data = {
     "name": fake.name(),
     "username": fake.user_name()[:8],
 }
-# "password": fake.password(length=15),
 
 
 def administrator_signup(client, seed=None):
     # Seed random function
-    if seed: 
+    if seed:
         random.seed(seed)
 
-    logged_in_superuser = superuser_login(client)
+    superuser_login(client)
 
     admin_details = administrator_signup_correct_credentials()
 
@@ -40,6 +39,8 @@ def administrator_signup_username_exists():
         "name": fake.name(),
         "username": data["username"],
     }
+
+
 # "password": fake.password(length=15),
 
 
@@ -50,6 +51,7 @@ def administrator_signup_email_exists():
         "username": fake.user_name()[:8],
     }
 
+
 def administrator_modify():
     return {"name": fake.name(), "username": fake.user_name()[:8]}
 
@@ -57,7 +59,7 @@ def administrator_modify():
 def administrator_login(client, seed=None):
     if seed:
         random.seed(seed)
-    
+
     response = client.post(
         "/api/v1/administrators/login",
         json=administrator_login_correct_credentials(),

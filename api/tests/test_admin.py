@@ -13,12 +13,9 @@ from ..test_data.admin_data import (
 from ..test_data.superuser_data import *
 from ..test_data.organization_data import organization_create
 from ..test_data.voter_data import voter_create, voter_login
-from random import randint, random, seed
 
 
 def test_administrator_signup_successful(client):
-    seed = 1000
-
     # Remove all data from database
     truncate_db_tables()
 
@@ -178,7 +175,7 @@ def test_administrator_modify_id_non_existent(client):
 
 def test_administrator_modify_unauthorized(client):
     seed = randint(100, 500)
-    
+
     # Remove all data from database
     truncate_db_tables()
 
@@ -343,9 +340,7 @@ def test_administrator_get_all_successful(client, seed):
         response.json["administrators"][0]["name"]
         == created_administrator.name
     )
-    assert (
-        response.json["administrators"][0]["id"] == created_administrator.id
-    )
+    assert response.json["administrators"][0]["id"] == created_administrator.id
     assert (
         response.json["administrators"][0]["username"]
         == created_administrator.username

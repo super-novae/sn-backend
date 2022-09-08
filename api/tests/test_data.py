@@ -12,7 +12,6 @@ from ..test_data.voter_data import (
     voter_login,
     voter_create_vote,
 )
-from random import randint
 
 
 def test_data_get_election_results(client, seed):

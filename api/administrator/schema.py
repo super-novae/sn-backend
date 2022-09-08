@@ -1,6 +1,6 @@
 from apiflask import Schema
 from apiflask.fields import String, Email, List, Nested
-from apiflask.validators import Length, Regexp
+from apiflask.validators import Length
 
 
 class AdministratorSchema(Schema):
@@ -8,6 +8,7 @@ class AdministratorSchema(Schema):
     name = String(required=True, validate=[Length(min=5, max=80)])
     username = String(required=True, validate=[Length(min=4, max=15)])
     email = Email(required=True)
+
 
 class AdministratorModifySchema(Schema):
     name = String(required=False, validate=[Length(min=5, max=80)])

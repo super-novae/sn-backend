@@ -16,6 +16,7 @@ def app():
 def client(app):
     yield app.test_client()
 
+
 @pytest.fixture
 def seed(app):
     yield random.randint(100, 500)
