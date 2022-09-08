@@ -54,9 +54,7 @@ def test_administrator_signup_successful(client):
     assert response.json["id"] == created_administrator.id
 
 
-def test_administrator_signup_username_exists(client):
-    seed = randint(100, 500)
-
+def test_administrator_signup_username_exists(client, seed):
     # Remove all data from database
     truncate_db_tables()
 
@@ -82,9 +80,7 @@ def test_administrator_signup_username_exists(client):
     )
 
 
-def test_administrator_signup_email_exists(client):
-    seed = randint(100, 500)
-
+def test_administrator_signup_email_exists(client, seed):
     # Remove all data from database
     truncate_db_tables()
 
@@ -110,9 +106,7 @@ def test_administrator_signup_email_exists(client):
     )
 
 
-def test_administrator_signup_unauthorized(client):
-    seed = randint(100, 500)
-
+def test_administrator_signup_unauthorized(client, seed):
     # Remove all data from database
     truncate_db_tables()
 
@@ -173,9 +167,7 @@ def test_administrator_modify_id_non_existent(client):
     )
 
 
-def test_administrator_modify_unauthorized(client):
-    seed = randint(100, 500)
-
+def test_administrator_modify_unauthorized(client, seed):
     # Remove all data from database
     truncate_db_tables()
 
@@ -198,9 +190,7 @@ def test_administrator_modify_unauthorized(client):
     )
 
 
-def test_administrator_delete_successful(client):
-    seed = randint(100, 500)
-
+def test_administrator_delete_successful(client, seed):
     # Remove all data from database
     truncate_db_tables()
 
@@ -219,9 +209,7 @@ def test_administrator_delete_successful(client):
     assert response.json["message"] == "Administrator deleted successfully"
 
 
-def test_administrator_delete_id_non_existent(client):
-    seed = randint(100, 500)
-
+def test_administrator_delete_id_non_existent(client, seed):
     # Remove all data from database
     truncate_db_tables()
 
@@ -243,9 +231,7 @@ def test_administrator_delete_id_non_existent(client):
     )
 
 
-def test_administrator_delete_unauthorized(client):
-    seed = randint(100, 500)
-
+def test_administrator_delete_unauthorized(client, seed):
     # Remove all data from database
     truncate_db_tables()
 
