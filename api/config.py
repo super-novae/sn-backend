@@ -35,7 +35,6 @@ class DevelopmentConfig(BaseConfig):
 class TestingConfig(BaseConfig):
     SQLALCHEMY_DATABASE_URI = getenv("TEST_DATABASE_URL")
     TESTING = True
-    MAIL_SUPPRESS_SEND = False
 
 
 class ProductionConfig(BaseConfig):
