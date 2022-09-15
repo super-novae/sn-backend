@@ -1,5 +1,5 @@
 from .models import Organization
-from .schema import OrganizationSchema, OrganizationModifySchema
+from .schema import OrganizationSchema, OrganizationModifySchema, OrganizationsSchema
 from .errors import OrganizationNotFound
 from api.administrator.schema import AdministratorSchema
 from api.administrator.models import Administrator
@@ -135,3 +135,20 @@ def organization_get_administrator(id):
     administrator = Administrator.find_by_id(organization.administrator_id)
 
     return administrator, 200
+
+@organization.get("/")
+@organization.output(OrganizationsSchema)
+@organization.doc(
+    summary="Organization Get All",
+    description="An endpoint to get all organization",
+    responses=[200, 403]
+)
+@jwt_required()
+def organization_get_all():
+    user_has_required_roles = has_roles(["super"], get_jwt_identity())
+    if not user_has_required_roles:
+        raise UserDoesNotHaveRequiredRoles
+
+    organizations = Organization.find_all()
+
+    return {"organizations":organizations}, 200
