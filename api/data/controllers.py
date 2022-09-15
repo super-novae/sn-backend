@@ -17,7 +17,9 @@ data = APIBlueprint("data", __name__, tag="Data", url_prefix="/api/v1/data")
 @data.output(ElectionResultSchema)
 @jwt_required()
 def data_get_election_results(query):
-    user_has_required_roles = has_roles(["admin"], get_jwt_identity())
+    user_has_required_roles = has_roles(
+        ["admin", "super", "voter"], get_jwt_identity()
+    )
 
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles

@@ -1,5 +1,5 @@
 from apiflask import Schema
-from apiflask.fields import String, Nested
+from apiflask.fields import String, Nested, List
 from apiflask.validators import Length, Regexp
 
 
@@ -16,4 +16,4 @@ class OrganizationModifySchema(Schema):
 
 
 class OrganizationsSchema(Schema):
-    organizations = Nested(OrganizationSchema)
+    organizations = List(Nested(OrganizationSchema))

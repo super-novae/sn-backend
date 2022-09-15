@@ -5,6 +5,13 @@ from api.voter.models import Voter
 # from api.voter.models import Voter
 from .errors import *
 
+security_headers = {
+    "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "SAMEORIGIN",
+    "Content-Security-Policy": "default-src 'self'",
+}
+
 
 def has_roles(role_list, id):
     roles = {"super": Superuser, "admin": Administrator, "voter": Voter}

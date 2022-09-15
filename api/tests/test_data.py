@@ -12,19 +12,15 @@ from ..test_data.voter_data import (
     voter_login,
     voter_create_vote,
 )
-from random import randint
 
 
-def test_data_get_election_results(client):
+def test_data_get_election_results(client, seed):
     # Clear database before tests
     truncate_db_tables()
 
-    # Create seed to generate the same data
-    seed = randint(1, 200)
-
     # Initialize the data and model instances
     superuser_create()
-    administrator_signup(client)
+    administrator_signup(client, seed)
     organization = organization_create()
     election = election_create()
     office_create()

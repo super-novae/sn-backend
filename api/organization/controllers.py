@@ -1,15 +1,17 @@
-from sys import exc_info
-
 from .models import Organization
-from .schema import OrganizationSchema, OrganizationModifySchema
+from .schema import (
+    OrganizationSchema,
+    OrganizationModifySchema,
+    OrganizationsSchema,
+)
 from .errors import OrganizationNotFound
 from api.administrator.schema import AdministratorSchema
 from api.administrator.models import Administrator
-from api.extensions import db, logger
+from api.generic.db import save, modify, delete
 from api.generic.methods import has_roles
 from api.generic.errors import UserDoesNotHaveRequiredRoles
 from api.generic.responses import GenericMessage
-from apiflask import APIBlueprint, abort
+from apiflask import APIBlueprint
 from flask_jwt_extended import get_jwt_identity, jwt_required
 
 organization = APIBlueprint(
@@ -30,29 +32,17 @@ organization = APIBlueprint(
 )
 @jwt_required()
 def organization_create(data):
-    error = False
 
     user_has_required_roles = has_roles(["super"], get_jwt_identity())
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
 
-    new_organizatioon = Organization(**data)
+    new_organization = Organization(**data)
 
-    try:
-        db.session.add(new_organizatioon)
-        db.session.commit()
-
-    except Exception:
-        error = True
-        logger.warning(exc_info())
-        db.session.rollback()
-        abort(500)
-
-    finally:
-        db.session.close()
+    new_organization, error = save(new_organization)
 
     if not error:
-        return new_organizatioon
+        return new_organization
 
 
 @organization.put("/<id>")
@@ -65,8 +55,6 @@ def organization_create(data):
 )
 @jwt_required()
 def organization_modify_by_id(id, data):
-    error = False
-
     user_has_required_roles = has_roles(["super"], get_jwt_identity())
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
@@ -76,17 +64,8 @@ def organization_modify_by_id(id, data):
     if organization:
         for attribute, value in data.items():
             setattr(organization, attribute, value)
-        try:
-            db.session.commit()
 
-        except Exception:
-            error = True
-            logger.warning(exc_info())
-            db.session.rollback()
-            abort(500)
-
-        finally:
-            db.session.close()
+        organization, error = modify(organization)
 
         if not error:
             return organization
@@ -103,8 +82,6 @@ def organization_modify_by_id(id, data):
 )
 @jwt_required()
 def organization_delete_by_id(id):
-    error = False
-
     user_has_required_roles = has_roles(["super"], get_jwt_identity())
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
@@ -112,18 +89,7 @@ def organization_delete_by_id(id):
     organization = Organization.find_by_id(id)
 
     if organization:
-        try:
-            db.session.delete(organization)
-            db.session.commit()
-
-        except Exception:
-            error = True
-            logger.warning(exc_info())
-            db.session.rollback()
-            abort(500)
-
-        finally:
-            db.session.close()
+        organization, error = delete(organization)
 
         if not error:
             return {
@@ -173,3 +139,21 @@ def organization_get_administrator(id):
     administrator = Administrator.find_by_id(organization.administrator_id)
 
     return administrator, 200
+
+
+@organization.get("/")
+@organization.output(OrganizationsSchema)
+@organization.doc(
+    summary="Organization Get All",
+    description="An endpoint to get all organization",
+    responses=[200, 403],
+)
+@jwt_required()
+def organization_get_all():
+    user_has_required_roles = has_roles(["super"], get_jwt_identity())
+    if not user_has_required_roles:
+        raise UserDoesNotHaveRequiredRoles
+
+    organizations = Organization.find_all()
+
+    return {"organizations": organizations}, 200

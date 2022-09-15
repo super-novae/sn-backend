@@ -1,4 +1,4 @@
-from apiflask import APIBlueprint, abort
+from apiflask import APIBlueprint
 from flask_jwt_extended import (
     jwt_required,
     create_access_token,
@@ -6,7 +6,9 @@ from flask_jwt_extended import (
 )
 
 from ..generic.responses import GenericMessage
-from api.extensions import db, logger
+from ..generic.db import delete, save, modify
+from ..generic.password import generate_password
+from ..generic.mail import send_password_to_admin
 from .errors import (
     AdministratorWithIdDoesNotExist,
     AdministratorWithCredentialsDoesNotExist,
@@ -23,7 +25,6 @@ from .schema import (
 )
 from api.generic.methods import has_roles
 from api.generic.errors import UserDoesNotHaveRequiredRoles
-from sys import exc_info
 
 # Initiate module blueprint
 administrator = APIBlueprint(
@@ -44,8 +45,6 @@ administrator = APIBlueprint(
 )
 @jwt_required()
 def administrator_sign_up(data):
-    error = False
-
     user_has_required_roles = has_roles(["super"], get_jwt_identity())
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
@@ -62,21 +61,13 @@ def administrator_sign_up(data):
 
     # Create admin instance
     admin = Administrator(**data)
-    admin.password = data["password"]
+    password = generate_password()
 
-    try:
-        # Commit to database
-        db.session.add(admin)
-        db.session.commit()
+    admin.password = password
 
-    except Exception:
-        error = True
-        logger.warning(exc_info())
-        db.session.rollback()
-        abort(500)
+    send_password_to_admin(admin.email, admin.name, password)
 
-    finally:
-        db.session.close()
+    admin, error = save(admin)
 
     if not error:
         return admin, 201
@@ -92,8 +83,6 @@ def administrator_sign_up(data):
 )
 @jwt_required()
 def administrator_modify(admin_id, data):
-    error = False
-
     user_has_required_roles = has_roles(["super"], get_jwt_identity())
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
@@ -118,18 +107,7 @@ def administrator_modify(admin_id, data):
 
     for attribute, value in data.items():
         setattr(admin, attribute, value)
-
-    try:
-        db.session.commit()
-
-    except Exception:
-        error = True
-        logger.warning(exc_info())
-        db.session.rollback()
-        abort(500)
-
-    finally:
-        db.session.close()
+    admin, error = modify(admin)
 
     if not error:
         return {"message": "Administrator modified successfully"}, 200
@@ -144,8 +122,6 @@ def administrator_modify(admin_id, data):
 )
 @jwt_required()
 def administrator_delete(admin_id):
-    error = False
-
     user_has_required_roles = has_roles(["super"], get_jwt_identity())
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
@@ -154,18 +130,7 @@ def administrator_delete(admin_id):
     if not admin:
         raise AdministratorWithIdDoesNotExist
 
-    try:
-        db.session.delete(admin)
-        db.session.commit()
-
-    except Exception:
-        error = True
-        logger.warning(exc_info())
-        db.session.rollback()
-        abort(500)
-
-    finally:
-        db.session.close()
+    admin, error = delete(admin)
 
     if not error:
         return {"message": "Administrator deleted successfully"}, 200

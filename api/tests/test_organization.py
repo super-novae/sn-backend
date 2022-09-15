@@ -9,13 +9,13 @@ from ..test_data.organization_data import (
 from ..test_data.superuser_data import superuser_create, superuser_login
 
 
-def test_organization_create_successful(client):
+def test_organization_create_successful(client, seed):
     # Remove all data from database
     truncate_db_tables()
 
     # Initialize data and model instances
     superuser_create()
-    administrator_signup(client)
+    administrator_signup(client, seed)
     superuser = superuser_login(client)
 
     response = client.post(
@@ -31,14 +31,14 @@ def test_organization_create_successful(client):
     truncate_db_tables()
 
 
-def test_organization_create_not_authorized(client):
+def test_organization_create_not_authorized(client, seed):
     # Remove all data from database
     truncate_db_tables()
 
     # Initialize data and model instances
     superuser_create()
-    administrator_signup(client)
-    administrator = administrator_login(client)
+    administrator_signup(client, seed)
+    administrator = administrator_login(client, seed)
 
     response = client.post(
         "/api/v1/organization/",
@@ -56,13 +56,13 @@ def test_organization_create_not_authorized(client):
     truncate_db_tables()
 
 
-def test_organization_modify_by_id_successful(client):
+def test_organization_modify_by_id_successful(client, seed):
     # Remove all data from database
     truncate_db_tables()
 
     # Initialize data and model instances
     superuser_create()
-    administrator_signup(client)
+    administrator_signup(client, seed)
     organization = organization_create()
     organization_name = organization.name
     superuser = superuser_login(client)
@@ -83,13 +83,13 @@ def test_organization_modify_by_id_successful(client):
     truncate_db_tables()
 
 
-def test_organization_modify_by_id_non_existent(client):
+def test_organization_modify_by_id_non_existent(client, seed):
     # Remove all data from database
     truncate_db_tables()
 
     # Initialize data and model instances
     superuser_create()
-    administrator_signup(client)
+    administrator_signup(client, seed)
     organization_create()
     superuser = superuser_login(client)
 
@@ -109,14 +109,14 @@ def test_organization_modify_by_id_non_existent(client):
     truncate_db_tables()
 
 
-def test_organization_modify_by_id_not_authorized(client):
+def test_organization_modify_by_id_not_authorized(client, seed):
     # Remove all data from database
     truncate_db_tables()
 
     # Initialize data and model instances
     superuser_create()
-    administrator_signup(client)
-    administrator = administrator_login(client)
+    administrator_signup(client, seed)
+    administrator = administrator_login(client, seed)
     organization = organization_create()
 
     response = client.put(
@@ -135,13 +135,13 @@ def test_organization_modify_by_id_not_authorized(client):
     truncate_db_tables()
 
 
-def test_organization_delete_by_id_successful(client):
+def test_organization_delete_by_id_successful(client, seed):
     # Remove all data from database
     truncate_db_tables()
 
     # Initialize data and model instances
     superuser_create()
-    administrator_signup(client)
+    administrator_signup(client, seed)
     organization = organization_create()
     superuser = superuser_login(client)
 
@@ -164,13 +164,13 @@ def test_organization_delete_by_id_successful(client):
     truncate_db_tables()
 
 
-def test_organization_delete_by_id_non_existent(client):
+def test_organization_delete_by_id_non_existent(client, seed):
     # Remove all data from database
     truncate_db_tables()
 
     # Initialize data and model instances
     superuser_create()
-    administrator_signup(client)
+    administrator_signup(client, seed)
     organization_create()
     superuser = superuser_login(client)
 
@@ -190,15 +190,15 @@ def test_organization_delete_by_id_non_existent(client):
     truncate_db_tables()
 
 
-def test_organization_delete_by_id_not_authorized(client):
+def test_organization_delete_by_id_not_authorized(client, seed):
     # Remove all data from database
     truncate_db_tables()
 
     # Initialize data and model instances
     superuser_create()
-    administrator_signup(client)
+    administrator_signup(client, seed)
     organization = organization_create()
-    administrator = administrator_login(client)
+    administrator = administrator_login(client, seed)
 
     response = client.delete(
         f"/api/v1/organization/{organization.id}",
@@ -215,13 +215,13 @@ def test_organization_delete_by_id_not_authorized(client):
     truncate_db_tables()
 
 
-def test_organization_get_by_id_successful(client):
+def test_organization_get_by_id_successful(client, seed):
     # Remove all data from database
     truncate_db_tables()
 
     # Initialize data and model instances
     superuser_create()
-    administrator_signup(client)
+    administrator_signup(client, seed)
     organization = organization_create()
     superuser = superuser_login(client)
 
@@ -236,15 +236,15 @@ def test_organization_get_by_id_successful(client):
     assert response.json["name"]
 
 
-def test_organization_get_by_id_not_authorized(client):
+def test_organization_get_by_id_not_authorized(client, seed):
     # Remove all data from database
     truncate_db_tables()
 
     # Initialize data and model instances
     superuser_create()
-    administrator_signup(client)
+    administrator_signup(client, seed)
     organization = organization_create()
-    administrator = administrator_login(client)
+    administrator = administrator_login(client, seed)
 
     response = client.get(
         f"/api/v1/organization/{organization.id}",
@@ -258,13 +258,13 @@ def test_organization_get_by_id_not_authorized(client):
     )
 
 
-def test_organization_get_by_id_not_found(client):
+def test_organization_get_by_id_not_found(client, seed):
     # Remove all data from database
     truncate_db_tables()
 
     # Initialize data and model instances
     superuser_create()
-    administrator_signup(client)
+    administrator_signup(client, seed)
     organization = organization_create()
     superuser = superuser_login(client)
 
@@ -280,13 +280,13 @@ def test_organization_get_by_id_not_found(client):
     )
 
 
-def test_organization_get_administrator_successful(client):
+def test_organization_get_administrator_successful(client, seed):
     # Remove all data from database
     truncate_db_tables()
 
     # Initialize data and model instances
     superuser_create()
-    administrator_signup(client)
+    administrator_signup(client, seed)
     organization = organization_create()
     superuser = superuser_login(client)
 
@@ -302,15 +302,15 @@ def test_organization_get_administrator_successful(client):
     assert response.json["username"]
 
 
-def test_organization_get_administrator_not_authorized(client):
+def test_organization_get_administrator_not_authorized(client, seed):
     # Remove all data from database
     truncate_db_tables()
 
     # Initialize data and model instances
     superuser_create()
-    administrator_signup(client)
+    administrator_signup(client, seed)
     organization = organization_create()
-    administrator = administrator_login(client)
+    administrator = administrator_login(client, seed)
 
     response = client.get(
         f"/api/v1/organization/{organization.id}/administrator",
@@ -324,13 +324,13 @@ def test_organization_get_administrator_not_authorized(client):
     )
 
 
-def test_organization_get_administrator_not_found(client):
+def test_organization_get_administrator_not_found(client, seed):
     # Remove all data from database
     truncate_db_tables()
 
     # Initialize data and model instances
     superuser_create()
-    administrator_signup(client)
+    administrator_signup(client, seed)
     organization = organization_create()
     superuser = superuser_login(client)
 
@@ -343,4 +343,45 @@ def test_organization_get_administrator_not_found(client):
     assert (
         response.json["message"]
         == "Organization with the given ID does not exists"
+    )
+
+
+def test_organization_get_all_successful(client, seed):
+    # Remove all data from database
+    truncate_db_tables()
+
+    # Initialize data and model instances
+    superuser_create()
+    administrator_signup(client, seed)
+    organization_create()
+    superuser = superuser_login(client)
+
+    response = client.get(
+        f"/api/v1/organization/",
+        headers={"Authorization": f"Bearer {superuser['auth_token']}"},
+    )
+
+    assert response.status_code == 200
+    assert response.json["organizations"]
+
+
+def test_organization_get_all_unauthorized(client, seed):
+    # Remove all data from database
+    truncate_db_tables()
+
+    # Initialize data and model instances
+    superuser_create()
+    administrator_signup(client, seed)
+    organization_create()
+    administrator = administrator_login(client, seed)
+
+    response = client.get(
+        f"/api/v1/organization/",
+        headers={"Authorization": f"Bearer {administrator['auth_token']}"},
+    )
+
+    assert response.status_code == 403
+    assert (
+        response.json["message"]
+        == "User does not have the required permissions to perform action"
     )

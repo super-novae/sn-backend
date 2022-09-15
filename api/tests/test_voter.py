@@ -20,18 +20,20 @@ from api.voter.models import Voter
 from random import randint
 
 
-def test_voter_signup_successful(client):
+def test_voter_signup_successful(client, seed):
     # Clear database before tests
     truncate_db_tables()
 
     # Initialize the data and model instances
     superuser_create()
-    administrator_signup(client)
+    administrator_signup(client, seed)
     organization_create()
     election_create()
-    voter = voter_details_single()
 
-    administrator = administrator_login(client)
+    voter = voter_details_single()
+    voter.pop("password")
+
+    administrator = administrator_login(client, seed)
 
     response = client.post(
         "/api/v1/voters/signup",
@@ -49,7 +51,7 @@ def test_voter_signup_successful(client):
     truncate_db_tables()
 
 
-def test_voter_signup_voter_already_exists(client):
+def test_voter_signup_voter_already_exists(client, seed):
     # Clear database before tests
     truncate_db_tables()
 
@@ -58,15 +60,18 @@ def test_voter_signup_voter_already_exists(client):
 
     # Initialize the data and model instances
     superuser_create()
-    administrator_signup(client)
+    administrator_signup(client, seed)
     organization_create()
     election_create()
     voter_create(seed)
-    administrator = administrator_login(client)
+    administrator = administrator_login(client, seed)
+
+    voter_details = voter_details_single(seed)
+    voter_details.pop("password")
 
     response = client.post(
         "/api/v1/voters/signup",
-        json=voter_details_single(seed),
+        json=voter_details,
         headers={"Authorization": f"Bearer {administrator['auth_token']}"},
     )
 
@@ -80,16 +85,18 @@ def test_voter_signup_voter_already_exists(client):
     truncate_db_tables()
 
 
-def test_voter_signup_unauthorized(client):
+def test_voter_signup_unauthorized(client, seed):
     # Clear database before tests
     truncate_db_tables()
 
     # Initialize the data and model instances
     superuser_create()
-    administrator_signup(client)
+    administrator_signup(client, seed)
     organization_create()
     election_create()
+
     voter = voter_details_single()
+    voter.pop("password")
 
     superuser = superuser_login(client)
 
@@ -109,16 +116,16 @@ def test_voter_signup_unauthorized(client):
     truncate_db_tables()
 
 
-def test_voter_bulk_signup_successful(client):
+def test_voter_bulk_signup_successful(client, seed):
     # Clear database before tests
     truncate_db_tables()
 
     # Initialize the data and model instances
     superuser_create()
-    administrator_signup(client)
+    administrator_signup(client, seed)
     organization_create()
     election_create()
-    administrator = administrator_login(client)
+    administrator = administrator_login(client, seed)
 
     voters = voter_details_multiple()
 
@@ -138,13 +145,13 @@ def test_voter_bulk_signup_successful(client):
     truncate_db_tables()
 
 
-def test_voter_bulk_signup_unauthorized(client):
+def test_voter_bulk_signup_unauthorized(client, seed):
     # Clear database before tests
     truncate_db_tables()
 
     # Initialize the data and model instances
     superuser_create()
-    administrator_signup(client)
+    administrator_signup(client, seed)
     organization_create()
     election_create()
     superuser = superuser_login(client)
@@ -167,11 +174,11 @@ def test_voter_bulk_signup_unauthorized(client):
     truncate_db_tables()
 
 
-def test_voter_bulk_signup_server_error(client):
+def test_voter_bulk_signup_server_error(client, seed):
     pass  # TODO: Come back to this when i find a way to get 500
 
 
-def test_voter_login_successful(client):
+def test_voter_login_successful(client, seed):
     # Clear database before tests
     truncate_db_tables()
 
@@ -180,7 +187,7 @@ def test_voter_login_successful(client):
 
     # Initialize the data and model instances
     superuser_create()
-    administrator_signup(client)
+    administrator_signup(client, seed)
     organization_create()
     election_create()
     voter = voter_create(seed)
@@ -197,7 +204,7 @@ def test_voter_login_successful(client):
     truncate_db_tables()
 
 
-def test_voter_login_voter_does_not_exist(client):
+def test_voter_login_voter_does_not_exist(client, seed):
     # Clear database before tests
     truncate_db_tables()
 
@@ -206,7 +213,7 @@ def test_voter_login_voter_does_not_exist(client):
 
     # Initialize the data and model instances
     superuser_create()
-    administrator_signup(client)
+    administrator_signup(client, seed)
     organization_create()
     election_create()
     voter_create(seed)
@@ -225,7 +232,7 @@ def test_voter_login_voter_does_not_exist(client):
     truncate_db_tables()
 
 
-def test_voter_get_by_id_successful(client):
+def test_voter_get_by_id_successful(client, seed):
     # Clear database before tests
     truncate_db_tables()
 
@@ -234,12 +241,12 @@ def test_voter_get_by_id_successful(client):
 
     # Initialize the data and model instances
     superuser_create()
-    administrator_signup(client)
+    administrator_signup(client, seed)
     organization_create()
     election_create()
     voter_create(seed)
 
-    administrator = administrator_login(client)
+    administrator = administrator_login(client, seed)
     voter = voter_login(client, seed)
 
     response = client.get(
@@ -254,7 +261,7 @@ def test_voter_get_by_id_successful(client):
     truncate_db_tables()
 
 
-def test_voter_get_by_id_voter_does_not_exist(client):
+def test_voter_get_by_id_voter_does_not_exist(client, seed):
     # Clear database before tests
     truncate_db_tables()
 
@@ -263,12 +270,12 @@ def test_voter_get_by_id_voter_does_not_exist(client):
 
     # Initialize the data and model instances
     superuser_create()
-    administrator_signup(client)
+    administrator_signup(client, seed)
     organization_create()
     election_create()
     voter_create(seed)
 
-    administrator = administrator_login(client)
+    administrator = administrator_login(client, seed)
     voter = voter_login(client, seed)
 
     response = client.get(
@@ -285,7 +292,7 @@ def test_voter_get_by_id_voter_does_not_exist(client):
     truncate_db_tables()
 
 
-def test_voter_get_by_id_unauthorized(client):
+def test_voter_get_by_id_unauthorized(client, seed):
     # Clear database before tests
     truncate_db_tables()
 
@@ -294,7 +301,7 @@ def test_voter_get_by_id_unauthorized(client):
 
     # Initialize the data and model instances
     superuser_create()
-    administrator_signup(client)
+    administrator_signup(client, seed)
     organization_create()
     election_create()
     voter_create(seed)
@@ -317,7 +324,7 @@ def test_voter_get_by_id_unauthorized(client):
     truncate_db_tables()
 
 
-def test_voter_get_all_successful(client):
+def test_voter_get_all_successful(client, seed):
     # Clear database before tests
     truncate_db_tables()
 
@@ -326,12 +333,12 @@ def test_voter_get_all_successful(client):
 
     # Initialize the data and model instances
     superuser_create()
-    administrator_signup(client)
+    administrator_signup(client, seed)
     organization = organization_create()
     election_create()
     voter_create(seed)
 
-    administrator = administrator_login(client)
+    administrator = administrator_login(client, seed)
     voter_login(client, seed)
 
     response = client.get(
@@ -347,7 +354,7 @@ def test_voter_get_all_successful(client):
     truncate_db_tables()
 
 
-def test_voter_get_all_unauthorized(client):
+def test_voter_get_all_unauthorized(client, seed):
     # Clear database before tests
     truncate_db_tables()
 
@@ -356,7 +363,7 @@ def test_voter_get_all_unauthorized(client):
 
     # Initialize the data and model instances
     superuser_create()
-    administrator_signup(client)
+    administrator_signup(client, seed)
     organization = organization_create()
     election_create()
     voter_create(seed)
@@ -379,7 +386,7 @@ def test_voter_get_all_unauthorized(client):
     truncate_db_tables()
 
 
-def test_voter_get_all_organization_not_found(client):
+def test_voter_get_all_organization_not_found(client, seed):
     # Clear database before tests
     truncate_db_tables()
 
@@ -388,12 +395,12 @@ def test_voter_get_all_organization_not_found(client):
 
     # Initialize the data and model instances
     superuser_create()
-    administrator_signup(client)
+    administrator_signup(client, seed)
     organization = organization_create()
     election_create()
     voter_create(seed)
 
-    administrator = administrator_login(client)
+    administrator = administrator_login(client, seed)
     voter_login(client, seed)
 
     response = client.get(
@@ -411,7 +418,7 @@ def test_voter_get_all_organization_not_found(client):
     truncate_db_tables()
 
 
-def test_voter_get_all_organization_id_not_provided(client):
+def test_voter_get_all_organization_id_not_provided(client, seed):
     # Clear database before tests
     truncate_db_tables()
 
@@ -420,12 +427,12 @@ def test_voter_get_all_organization_id_not_provided(client):
 
     # Initialize the data and model instances
     superuser_create()
-    administrator_signup(client)
+    administrator_signup(client, seed)
     organization_create()
     election_create()
     voter_create(seed)
 
-    administrator = administrator_login(client)
+    administrator = administrator_login(client, seed)
 
     response = client.get(
         f"/api/v1/voters/",
@@ -439,7 +446,7 @@ def test_voter_get_all_organization_id_not_provided(client):
     truncate_db_tables()
 
 
-def test_voter_get_elections_successful(client):
+def test_voter_get_elections_successful(client, seed):
     # Clear database before tests
     truncate_db_tables()
 
@@ -448,7 +455,7 @@ def test_voter_get_elections_successful(client):
 
     # Initialize the data and model instances
     superuser_create()
-    administrator_signup(client)
+    administrator_signup(client, seed)
     organization_create()
     election_create()
     voter_create(seed)
@@ -469,7 +476,7 @@ def test_voter_get_elections_successful(client):
     truncate_db_tables()
 
 
-def test_voter_get_elections_unauthorized(client):
+def test_voter_get_elections_unauthorized(client, seed):
     # Clear database before tests
     truncate_db_tables()
 
@@ -478,13 +485,13 @@ def test_voter_get_elections_unauthorized(client):
 
     # Initialize the data and model instances
     superuser_create()
-    administrator_signup(client)
+    administrator_signup(client, seed)
     organization_create()
     election_create()
     voter_create(seed)
 
     voter = voter_login(client, seed)
-    administrator = administrator_login(client)
+    administrator = administrator_login(client, seed)
 
     response = client.get(
         f"/api/v1/voters/{voter['id']}/elections",
@@ -501,7 +508,7 @@ def test_voter_get_elections_unauthorized(client):
     truncate_db_tables()
 
 
-def test_voter_cast_vote_successful(client):
+def test_voter_cast_vote_successful(client, seed):
     # Clear database before tests
     truncate_db_tables()
 
@@ -510,7 +517,7 @@ def test_voter_cast_vote_successful(client):
 
     # Initialize the data and model instances
     superuser_create()
-    administrator_signup(client)
+    administrator_signup(client, seed)
     organization_create()
     election_create()
     office_create()
@@ -532,7 +539,7 @@ def test_voter_cast_vote_successful(client):
     truncate_db_tables()
 
 
-def test_voter_cast_vote_unauthorized(client):
+def test_voter_cast_vote_unauthorized(client, seed):
     # Clear database before tests
     truncate_db_tables()
 
@@ -541,7 +548,7 @@ def test_voter_cast_vote_unauthorized(client):
 
     # Initialize the data and model instances
     superuser_create()
-    administrator_signup(client)
+    administrator_signup(client, seed)
     organization_create()
     election_create()
     office_create()
@@ -549,7 +556,7 @@ def test_voter_cast_vote_unauthorized(client):
     voter_create(seed)
 
     voter = voter_login(client, seed)
-    administrator = administrator_login(client)
+    administrator = administrator_login(client, seed)
 
     response = client.post(
         f"/api/v1/voters/{voter['id']}/vote",
@@ -567,7 +574,7 @@ def test_voter_cast_vote_unauthorized(client):
     truncate_db_tables()
 
 
-def test_voter_cast_vote_voter_has_already_cast_vote(client):
+def test_voter_cast_vote_voter_has_already_cast_vote(client, seed):
     # Clear database before tests
     truncate_db_tables()
 
@@ -576,7 +583,7 @@ def test_voter_cast_vote_voter_has_already_cast_vote(client):
 
     # Initialize the data and model instances
     superuser_create()
-    administrator_signup(client)
+    administrator_signup(client, seed)
     organization_create()
     election_create()
     office_create()
@@ -585,7 +592,7 @@ def test_voter_cast_vote_voter_has_already_cast_vote(client):
     voter_create_vote(seed)
 
     voter = voter_login(client, seed)
-    administrator_login(client)
+    administrator_login(client, seed)
 
     response = client.post(
         f"/api/v1/voters/{voter['id']}/vote",

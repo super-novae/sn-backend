@@ -19,6 +19,14 @@ class BaseConfig:
     SECRET_KEY = getenv("SECRET_KEY")
     BCRYPT_LOG_ROUNDS = 5
 
+    # Email Configurations
+    MAIL_SERVER = getenv("MAIL_SERVER")
+    MAIL_PORT = getenv("MAIL_PORT")
+    MAIL_USERNAME = getenv("MAIL_USERNAME")
+    MAIL_PASSWORD = getenv("MAIL_PASSWORD")
+    MAIL_USE_TLS = False
+    MAIL_USE_SSL = True
+
 
 class DevelopmentConfig(BaseConfig):
     SQLALCHEMY_DATABASE_URI = getenv("DEV_DATABASE_URL")

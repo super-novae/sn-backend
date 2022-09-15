@@ -29,7 +29,6 @@ class VoterSchema(Schema):
     date_created = Date(required=True, dump_only=True)
     organization_id = String(required=True, validate=[Length(equal=32)])
     auth_token = String(dump_only=True)
-    password = String(load_only=True, required=True)
 
 
 class VotersSchema(Schema):
@@ -39,6 +38,10 @@ class VotersSchema(Schema):
 class VoterLoginInputSchema(Schema):
     email = Email(required=True)
     password = String(required=True)
+
+
+class VoterRecoverAccountSchema(Schema):
+    email = Email(required=True)
 
 
 class VoterGetAllInputSchema(Schema):
