@@ -345,6 +345,7 @@ def test_organization_get_administrator_not_found(client, seed):
         == "Organization with the given ID does not exists"
     )
 
+
 def test_organization_get_all_successful(client, seed):
     # Remove all data from database
     truncate_db_tables()
@@ -359,9 +360,10 @@ def test_organization_get_all_successful(client, seed):
         f"/api/v1/organization/",
         headers={"Authorization": f"Bearer {superuser['auth_token']}"},
     )
-    
+
     assert response.status_code == 200
     assert response.json["organizations"]
+
 
 def test_organization_get_all_unauthorized(client, seed):
     # Remove all data from database
@@ -377,7 +379,7 @@ def test_organization_get_all_unauthorized(client, seed):
         f"/api/v1/organization/",
         headers={"Authorization": f"Bearer {administrator['auth_token']}"},
     )
-    
+
     assert response.status_code == 403
     assert (
         response.json["message"]
