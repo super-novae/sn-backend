@@ -344,3 +344,42 @@ def test_organization_get_administrator_not_found(client, seed):
         response.json["message"]
         == "Organization with the given ID does not exists"
     )
+
+def test_organization_get_all_successful(client, seed):
+    # Remove all data from database
+    truncate_db_tables()
+
+    # Initialize data and model instances
+    superuser_create()
+    administrator_signup(client, seed)
+    organization_create()
+    superuser = superuser_login(client)
+
+    response = client.get(
+        f"/api/v1/organization/",
+        headers={"Authorization": f"Bearer {superuser['auth_token']}"},
+    )
+    
+    assert response.status_code == 200
+    assert response.json["organizations"]
+
+def test_organization_get_all_unauthorized(client, seed):
+    # Remove all data from database
+    truncate_db_tables()
+
+    # Initialize data and model instances
+    superuser_create()
+    administrator_signup(client, seed)
+    organization_create()
+    administrator = administrator_login(client, seed)
+
+    response = client.get(
+        f"/api/v1/organization/",
+        headers={"Authorization": f"Bearer {administrator['auth_token']}"},
+    )
+    
+    assert response.status_code == 403
+    assert (
+        response.json["message"]
+        == "User does not have the required permissions to perform action"
+    )
