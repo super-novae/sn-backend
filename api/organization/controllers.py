@@ -27,7 +27,7 @@ organization = APIBlueprint(
 @organization.output(OrganizationSchema, status_code=201)
 @organization.doc(
     summary="Organization Create",
-    description="An endpoint for the creation of an organization",
+    description="An endpoint for the creation of an organization\n\nRoles: SUPERUSER",
     responses=[201, 403, 404],
 )
 @jwt_required()
@@ -50,7 +50,7 @@ def organization_create(data):
 @organization.output(OrganizationSchema)
 @organization.doc(
     summary="Organization Modify By Id",
-    description="An endpoint for modification of an organization",
+    description="An endpoint for modification of an organization\n\nRoles: SUPERUSER",
     responses=[200, 403, 404],
 )
 @jwt_required()
@@ -77,7 +77,7 @@ def organization_modify_by_id(id, data):
 @organization.output(GenericMessage)
 @organization.doc(
     summary="Organization Delete By Id",
-    description="An endpoint for the deletion of an organization",
+    description="An endpoint for the deletion of an organization\n\nRoles: SUPERUSER",
     responses=[200, 403, 404],
 )
 @jwt_required()
@@ -102,12 +102,12 @@ def organization_delete_by_id(id):
 @organization.output(OrganizationSchema)
 @organization.doc(
     summary="Organization Get By Id",
-    description="An endpoint for the deletion of an organization",
+    description="An endpoint for the deletion of an organization\n\nRoles: SUPERUSER, ADMIN",
     responses=[200, 403, 404],
 )
 @jwt_required()
 def organization_get_by_id(id):
-    user_has_required_roles = has_roles(["super"], get_jwt_identity())
+    user_has_required_roles = has_roles(["super", "admin"], get_jwt_identity())
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
 
@@ -122,8 +122,8 @@ def organization_get_by_id(id):
 @organization.get("/<id>/administrator")
 @organization.output(AdministratorSchema)
 @organization.doc(
-    summary="Organization Get Administrators By Id",
-    description="An endpoint for the deletion of an organization",
+    summary="Organization Get Administrator By Id",
+    description="An endpoint to get the administrator of an organization\n\nRoles: SUPERUSER",
     responses=[200, 403, 404],
 )
 @jwt_required()
@@ -145,7 +145,7 @@ def organization_get_administrator(id):
 @organization.output(OrganizationsSchema)
 @organization.doc(
     summary="Organization Get All",
-    description="An endpoint to get all organization",
+    description="An endpoint to get all registered organizations\n\nRoles: SUPERUSER",
     responses=[200, 403],
 )
 @jwt_required()

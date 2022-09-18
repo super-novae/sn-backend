@@ -33,7 +33,7 @@ election = APIBlueprint(
 @election.output(ElectionSchema)
 @election.doc(
     summary="Election Create",
-    description="An endpoint for the creation of an election",
+    description="An endpoint for the creation of an election\n\nRoles: ADMIN",
     responses=[201, 403],
 )
 @jwt_required()
@@ -55,7 +55,7 @@ def election_create(data):
 @election.output(GenericMessage)
 @election.doc(
     summary="Election modify",
-    description="An endpoint to modify an election",
+    description="An endpoint to modify an election\n\nRoles: ADMIN",
     responses=[200, 403, 404],
 )
 @jwt_required()
@@ -82,7 +82,7 @@ def election_modify(election_id, data):
 @election.output(GenericMessage)
 @election.doc(
     summary="Election Delete",
-    description="An endpoint to delete an election",
+    description="An endpoint to delete an election\n\nRoles: ADMIN",
     responses=[200, 403, 404],
 )
 @jwt_required()
@@ -108,7 +108,7 @@ def election_delete(election_id):
 @election.output(ElectionSchema)
 @election.doc(
     summary="Election Get by Id",
-    description="An endpoint to get an election by Id",
+    description="An endpoint to get an election by Id\n\nRoles: ADMIN, VOTER",
     responses=[200, 403, 404],
 )
 @jwt_required()
@@ -129,7 +129,7 @@ def election_get_by_id(election_id):
 @election.output(ElectionFullDetailsSchema)
 @election.doc(
     summary="Election Get By Id (Full Details)",
-    description="An endpoint to get an election and all related offices and candidates by id",
+    description="An endpoint to get an election and all related offices and candidates by id\n\nRoles: ADMIN, VOTER",
     responses=[200, 403, 404],
 )
 @jwt_required()
@@ -169,7 +169,7 @@ def election_get_by_id_full_details(election_id):
 @election.output(ElectionsSchema)
 @election.doc(
     summary="Election Get All by Organization Id",
-    description="An endpoint to get all elections by organization Id",
+    description="An endpoint to get all elections by organization Id\n\nRoles: ADMIN",
     responses=[200, 403],
 )
 @jwt_required()
@@ -190,7 +190,7 @@ def election_get_all_by_organization_id(organization_id):
 @election.output(OfficeSchema)
 @election.doc(
     summary="Election Create Office",
-    description="An endpoint to create an office in an election",
+    description="An endpoint to create an office in an election\n\nRoles: ADMIN",
     responses=[201, 403],
 )
 @jwt_required()
@@ -212,7 +212,7 @@ def election_create_office(election_id, data):
 @election.output(GenericMessage)
 @election.doc(
     summary="Election Modify Office",
-    description="An endpoint to modify an office in an election",
+    description="An endpoint to modify an office in an election\n\nRoles: ADMIN",
     responses=[200, 403, 404],
 )
 @jwt_required()
@@ -241,7 +241,7 @@ def election_modify_office(election_id, office_id, data):
 @election.output(GenericMessage)
 @election.doc(
     summary="Election Delete Office",
-    description="An endpoint to delete an office in an election",
+    description="An endpoint to delete an office in an election\n\nRoles: ADMIN",
     responses=[200, 403, 404],
 )
 @jwt_required()
@@ -267,7 +267,7 @@ def election_delete_office(election_id, office_id):
 @election.output(OfficeSchema)
 @election.doc(
     summary="Election Get Office By Id",
-    description="An endpoint to get an office by id in an election",
+    description="An endpoint to get an office by id in an election\n\nRoles: ADMIN, VOTER",
     responses=[200, 403, 404],
 )
 @jwt_required()
@@ -288,7 +288,7 @@ def election_get_office_by_id(election_id, office_id):
 @election.output(OfficesSchema)
 @election.doc(
     summary="Election Get Office By Id",
-    description="An endpoint to get all offices by election id",
+    description="An endpoint to get all offices by election id\n\nRoles: ADMIN, VOTER",
     responses=[200, 403],
 )
 @jwt_required()
@@ -307,7 +307,7 @@ def election_get_all_offices_by_election_id(election_id):
 @election.output(CandidateSchema)
 @election.doc(
     summary="Election Create Candidate",
-    description="An endpoint to create a candidate in election",
+    description="An endpoint to create a candidate in election\n\nRoles: ADMIN",
     responses=[201, 403],
 )
 @jwt_required()
@@ -329,7 +329,7 @@ def election_create_candidate(election_id, data):
 @election.output(GenericMessage)
 @election.doc(
     summary="Election Modify Candidate",
-    description="An endpoint to modify a candidate in election",
+    description="An endpoint to modify a candidate in election\n\nRoles: ADMIN",
     responses=[200, 403, 404],
 )
 @jwt_required()
@@ -358,7 +358,7 @@ def election_modify_candidate(election_id, candidate_id, data):
 @election.output(GenericMessage)
 @election.doc(
     summary="Election Delete Candidate",
-    description="An endpoint to delete a candidate in election",
+    description="An endpoint to delete a candidate in election\n\nRoles: ADMIN",
     responses=[200, 403, 404],
 )
 @jwt_required()
@@ -384,7 +384,7 @@ def election_delete_candidate(election_id, candidate_id):
 @election.output(CandidateSchema)
 @election.doc(
     summary="Election Get Candidate by Id",
-    description="An endpoint to get candidate by Id",
+    description="An endpoint to get candidate by Id\n\nRoles: ADMIN, VOTER",
     responses=[200, 403, 404],
 )
 @jwt_required()
@@ -407,7 +407,7 @@ def election_get_candidate_by_id(election_id, candidate_id):
 @election.output(CandidatesSchema)
 @election.doc(
     summary="Election Get Candidates by Election Id",
-    description="An endpoint to get all candidates by election Id",
+    description="An endpoint to get all candidates by election Id\n\nRoles: ADMIN, VOTER",
     responses=[200, 403, 404],
 )
 @jwt_required()

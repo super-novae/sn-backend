@@ -24,7 +24,7 @@ superuser = APIBlueprint(
 )
 @superuser.doc(
     summary="Superuser Login",
-    description="An endpoint for login of the superuser",
+    description="An endpoint for login of the superuser\n\nRoles: *",
     responses=[200, 404],
 )
 def superuser_login(data):

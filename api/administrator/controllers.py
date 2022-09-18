@@ -40,7 +40,7 @@ administrator = APIBlueprint(
 @administrator.output(AdministratorSchema, status_code=201)
 @administrator.doc(
     summary="Administrator Sign Up",
-    description="An endpoint for the creation of administrators",
+    description="An endpoint for the creation of administrators \n\nRoles: SUPERUSER",
     responses=[201, 403, 409],
 )
 @jwt_required()
@@ -78,7 +78,7 @@ def administrator_sign_up(data):
 @administrator.output(GenericMessage)
 @administrator.doc(
     summary="Administrator Modify By Id",
-    description="An endpoint to modify an administrator by id",
+    description="An endpoint to modify an administrator by id \n\nRoles: SUPERUSER",
     responses=[200, 403, 404],
 )
 @jwt_required()
@@ -117,7 +117,7 @@ def administrator_modify(admin_id, data):
 @administrator.output(GenericMessage)
 @administrator.doc(
     summary="Administrator Delete",
-    description="An endpoint for the deletion of an administrator",
+    description="An endpoint for the deletion of an administrator \n\nRoles: SUPERUSER",
     responses=[200, 403, 404],
 )
 @jwt_required()
@@ -141,7 +141,7 @@ def administrator_delete(admin_id):
 @administrator.output(AdministratorLoginOutputSchema)
 @administrator.doc(
     summary="Administrator Login",
-    description="An endpoint for the login of administrators",
+    description="An endpoint for the login of administrators\n\nRoles: *",
 )
 def administrator_login(data):
     admin = Administrator.find_by_email(data["email"])
@@ -158,7 +158,7 @@ def administrator_login(data):
 @administrator.output(AdministratorsSchema)
 @administrator.doc(
     summary="Administrator Get All",
-    description="An endpoint to get all administrators",
+    description="An endpoint to get all administrators \n\nRoles: SUPERUSER",
 )
 @jwt_required()
 def administrator_get_all():
@@ -176,12 +176,12 @@ def administrator_get_all():
 @administrator.output(AdministratorSchema)
 @administrator.doc(
     summary="Administrator Get By Id",
-    description="An endpoint to an administrator by ID",
+    description="An endpoint to an administrator by ID\n\nRoles: SUPERUSER",
 )
 @jwt_required()
 def administrator_get_by_id(admin_id):
     # Perform security checks
-    user_has_required_roles = has_roles(["super", "admin"], get_jwt_identity())
+    user_has_required_roles = has_roles(["super"], get_jwt_identity())
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
 

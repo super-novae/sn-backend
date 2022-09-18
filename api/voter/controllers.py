@@ -44,7 +44,7 @@ voters = APIBlueprint(
 @voters.output(VoterSchema)
 @voters.doc(
     summary="Voter Signup",
-    description="An endpoint for voter signup",
+    description="An endpoint for voter signup\n\nRoles: ADMIN",
     responses=[201, 403, 409],
 )
 @jwt_required()
@@ -78,7 +78,7 @@ def voter_signup(data):
 @voters.output(GenericMessage)
 @voters.doc(
     summary="Voter Signup (Bulk)",
-    description="An endpoint for bulk voter signup",
+    description="An endpoint for bulk voter signup\n\nRoles: ADMIN",
     responses=[201, 403],
 )
 @jwt_required()
@@ -124,7 +124,7 @@ def voter_bulk_signup(data):
 @voters.output(VoterSchema)
 @voters.doc(
     summary="Voter Login",
-    description="An endpoint for voter login",
+    description="An endpoint for voter login\n\nRoles: *",
     responses=[200, 404],
 )
 def voter_login(data):
@@ -142,7 +142,7 @@ def voter_login(data):
 @voters.output(VoterSchema)
 @voters.doc(
     summary="Voter Get By Id",
-    description="An endpoint to get a voter by ID",
+    description="An endpoint to get a voter by ID\n\nRoles: ADMIN, VOTER",
     responses=[200, 403, 404],
 )
 @jwt_required()
@@ -168,7 +168,7 @@ def voter_get_by_id(voter_id):
 @voters.output(VotersSchema)
 @voters.doc(
     summary="Voter Get All",
-    description="An endpoint to get all voters in organization",
+    description="An endpoint to get all voters in organization\n\nRoles: ADMIN",
     responses=[200, 400, 403, 404],
 )
 @jwt_required()
@@ -193,7 +193,7 @@ def voter_get_all(query):
 @voters.output(VoterElections)
 @voters.doc(
     summary="Voter Elections",
-    description="An endpoint to get all elections for voter",
+    description="An endpoint to get all elections for voter\n\nRoles: VOTER",
     responses=[200, 403],
 )
 @jwt_required()
@@ -220,7 +220,7 @@ def voter_get_elections(voter_id):
 @voters.output(VoteSchema)
 @voters.doc(
     summary="Voter Cast Vote",
-    description="An endpoint for the voter to cast his vote in an election",
+    description="An endpoint for the voter to cast his vote in an election\n\nRoles: VOTER",
     responses=[201, 400, 403],
 )
 @jwt_required()
@@ -258,7 +258,7 @@ def voter_cast_vote(voter_id, data):
 @voters.output(GenericMessage)
 @voters.doc(
     summary="Voter Reset Password",
-    description="An endpoint for the voter to reset her/his password",
+    description="An endpoint for the voter to reset her/his password\n\nRoles: *",
     responses=[200, 400],
 )
 def voter_reset_password(data):

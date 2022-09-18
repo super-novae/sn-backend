@@ -15,6 +15,9 @@ data = APIBlueprint("data", __name__, tag="Data", url_prefix="/api/v1/data")
 @data.get("/")
 @data.input(DataQuerySchema, location="query", example="hello")
 @data.output(ElectionResultSchema)
+@data.doc(
+    description="An endpoint to get the result of the election\n\nRoles: ADMIN, VOTER, SUPER"
+)
 @jwt_required()
 def data_get_election_results(query):
     user_has_required_roles = has_roles(
