@@ -13,13 +13,12 @@ class Organization(db.Model):
     administrator_id = db.Column(
         db.String(length=32),
         db.ForeignKey("sn_administrator.id"),
-        nullable=False,
+        nullable=True,
     )
 
-    def __init__(self, name, administrator_id):
+    def __init__(self, name):
         self.id = f"org-{token_hex()[:28]}"
         self.name = name
-        self.administrator_id = administrator_id
 
     @classmethod
     def find_by_id(cls, id):

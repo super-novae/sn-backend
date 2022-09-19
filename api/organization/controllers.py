@@ -3,8 +3,10 @@ from .schema import (
     OrganizationSchema,
     OrganizationModifySchema,
     OrganizationsSchema,
+    OrganizationAdminSchema,
 )
 from .errors import OrganizationNotFound
+from api.administrator.errors import AdministratorWithIdDoesNotExist
 from api.administrator.schema import AdministratorSchema
 from api.administrator.models import Administrator
 from api.generic.db import save, modify, delete
@@ -157,3 +159,30 @@ def organization_get_all():
     organizations = Organization.find_all()
 
     return {"organizations": organizations}, 200
+
+
+@organization.post("/<id>/administrator")
+@organization.input(OrganizationAdminSchema)
+@organization.output(GenericMessage)
+@organization.doc(
+    summary="Organization Add Administrator",
+    description="An endpoint to add an administrator to an organization",
+    responses=[200, 403, 404],
+)
+@jwt_required()
+def organization_add_administrator(id, data):
+    # Perform security checks
+    user_has_required_roles = has_roles(["super"], get_jwt_identity())
+    if not user_has_required_roles:
+        raise UserDoesNotHaveRequiredRoles
+
+    organization: Organization = Organization.find_by_id(id)
+    if organization:
+        admin = Administrator.find_by_id(data["administrator_id"])
+        if admin:
+            organization.administrator_id = data["administrator_id"]
+            organization, error = modify(organization)
+            if not error:
+                return {"message": "Administrator added successfully"}, 200
+        raise AdministratorWithIdDoesNotExist
+    raise OrganizationNotFound

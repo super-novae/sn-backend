@@ -363,22 +363,22 @@ def test_administrator_get_by_id_successful_admin(client, seed):
 
     # Initialize data and model instances
     superuser_create()
-    administrator_signup(client, seed)
-    logged_in_administrator = administrator_login(client, seed)
+    admin = administrator_signup(client, seed)
+    logged_in_superuser = superuser_login(client)
 
     # Create a request and store the response
     response = client.get(
-        f"/api/v1/administrators/{logged_in_administrator['id']}",
+        f"/api/v1/administrators/{admin.id}",
         headers={
-            "Authorization": f"Bearer {logged_in_administrator['auth_token']}"
+            "Authorization": f"Bearer {logged_in_superuser['auth_token']}"
         },
     )
 
     assert response.status_code == 200
-    assert response.json["email"] == logged_in_administrator["email"]
-    assert response.json["name"] == logged_in_administrator["name"]
-    assert response.json["id"] == logged_in_administrator["id"]
-    assert response.json["username"] == logged_in_administrator["username"]
+    assert response.json["email"] == admin.email
+    assert response.json["name"] == admin.name
+    assert response.json["id"] == admin.id
+    assert response.json["username"] == admin.username
 
 
 def test_administrator_get_by_id_successful_superuser(client, seed):
@@ -435,7 +435,7 @@ def test_administrator_get_by_id_not_authorized(client, seed):
 
     # Initialize the data and model instances
     superuser_create()
-    created_administrator = administrator_signup(client)
+    admin = administrator_signup(client, seed)
     organization_create()
     voter_create(seed)
 
@@ -443,7 +443,7 @@ def test_administrator_get_by_id_not_authorized(client, seed):
 
     # Create a request and store the response
     response = client.get(
-        f"/api/v1/administrators/{created_administrator.id}",
+        f"/api/v1/administrators/{admin.id}",
         headers={"Authorization": f"Bearer {voter['auth_token']}"},
     )
 

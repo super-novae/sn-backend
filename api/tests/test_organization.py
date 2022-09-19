@@ -5,8 +5,11 @@ from ..test_data.organization_data import (
     organization_details,
     organization_modified_details,
     organization_create,
+    organization_add_administrator,
+    organization_get_test_instance,
 )
 from ..test_data.superuser_data import superuser_create, superuser_login
+from ..test_data.voter_data import voter_create, voter_login
 
 
 def test_organization_create_successful(client, seed):
@@ -231,7 +234,6 @@ def test_organization_get_by_id_successful(client, seed):
     )
 
     assert response.status_code == 200
-    assert response.json["administrator_id"]
     assert response.json["id"]
     assert response.json["name"]
 
@@ -244,11 +246,13 @@ def test_organization_get_by_id_not_authorized(client, seed):
     superuser_create()
     administrator_signup(client, seed)
     organization = organization_create()
-    administrator = administrator_login(client, seed)
+    administrator_login(client, seed)
+    voter_create(seed)
+    voter = voter_login(client, seed)
 
     response = client.get(
         f"/api/v1/organization/{organization.id}",
-        headers={"Authorization": f"Bearer {administrator['auth_token']}"},
+        headers={"Authorization": f"Bearer {voter['auth_token']}"},
     )
 
     assert response.status_code == 403
@@ -288,6 +292,7 @@ def test_organization_get_administrator_successful(client, seed):
     superuser_create()
     administrator_signup(client, seed)
     organization = organization_create()
+    organization_add_administrator()
     superuser = superuser_login(client)
 
     response = client.get(
@@ -378,6 +383,106 @@ def test_organization_get_all_unauthorized(client, seed):
     response = client.get(
         f"/api/v1/organization/",
         headers={"Authorization": f"Bearer {administrator['auth_token']}"},
+    )
+
+    assert response.status_code == 403
+    assert (
+        response.json["message"]
+        == "User does not have the required permissions to perform action"
+    )
+
+
+def test_organization_add_administrator_success(client, seed):
+    # Remove all data from database
+    truncate_db_tables()
+
+    # Initialize data and model instances
+    superuser_create()
+    administrator = administrator_signup(client, seed)
+    organization = organization_create()
+    superuser = superuser_login(client)
+
+    response = client.post(
+        f"/api/v1/organization/{organization.id}/administrator",
+        headers={"Authorization": f"Bearer {superuser['auth_token']}"},
+        json={"administrator_id": administrator.id},
+    )
+
+    organization = organization_get_test_instance()
+
+    assert response.status_code == 200
+    assert response.json["message"] == "Administrator added successfully"
+    assert organization.administrator_id == administrator.id
+
+
+def test_organization_add_administrator_administrator_not_found(client, seed):
+    # Remove all data from database
+    truncate_db_tables()
+
+    # Initialize data and model instances
+    superuser_create()
+    administrator = administrator_signup(client, seed)
+    organization = organization_create()
+    superuser = superuser_login(client)
+
+    response = client.post(
+        f"/api/v1/organization/{organization.id}/administrator",
+        headers={"Authorization": f"Bearer {superuser['auth_token']}"},
+        json={
+            "administrator_id": administrator.id[:6]
+            + administrator.id[6:][::-1]
+        },
+    )
+
+    assert response.status_code == 404
+    assert (
+        response.json["message"]
+        == "Administrator with the given Id does not exist"
+    )
+
+
+def test_organization_add_administrator_organization_not_found(client, seed):
+    # Remove all data from database
+    truncate_db_tables()
+
+    # Initialize data and model instances
+    superuser_create()
+    administrator = administrator_signup(client, seed)
+    organization = organization_create()
+    superuser = superuser_login(client)
+
+    response = client.post(
+        f"/api/v1/organization/{organization.id[:4] + organization.id[4:][::-1]}/administrator",
+        headers={"Authorization": f"Bearer {superuser['auth_token']}"},
+        json={"administrator_id": administrator.id},
+    )
+
+    organization = organization_get_test_instance()
+
+    assert response.status_code == 404
+    assert (
+        response.json["message"]
+        == "Organization with the given ID does not exists"
+    )
+
+
+def test_organization_add_administrator_not_authorized(client, seed):
+    # Remove all data from database
+    truncate_db_tables()
+
+    # Initialize data and model instances
+    superuser_create()
+    administrator = administrator_signup(client, seed)
+    organization = organization_create()
+    # superuser = superuser_login(client)
+    logged_in_administrator = administrator_login(client, seed)
+
+    response = client.post(
+        f"/api/v1/organization/{organization.id}/administrator",
+        headers={
+            "Authorization": f"Bearer {logged_in_administrator['auth_token']}"
+        },
+        json={"administrator_id": administrator.id},
     )
 
     assert response.status_code == 403
