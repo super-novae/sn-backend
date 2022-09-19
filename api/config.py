@@ -24,7 +24,7 @@ class BaseConfig:
     MAIL_PORT = getenv("MAIL_PORT")
     MAIL_USERNAME = getenv("MAIL_USERNAME")
     MAIL_PASSWORD = getenv("MAIL_PASSWORD")
-    MAIL_USE_TLS = True
+    MAIL_USE_TLS = False
     MAIL_USE_SSL = True
 
 
