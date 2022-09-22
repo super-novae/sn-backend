@@ -67,3 +67,7 @@ class OfficeCandidates(Schema):
 class ElectionFullDetailsSchema(Schema):
     election = Nested(ElectionSchema)
     offices = List(Nested(OfficeCandidates))
+
+
+class ElectionStartEndSchema(Schema):
+    state = String(required=True, validate=[OneOf(["in-session", "on-hold"])])

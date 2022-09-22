@@ -8,6 +8,7 @@ from .schema import (
     CandidateSchema,
     CandidatesSchema,
     ElectionSchema,
+    ElectionStartEndSchema,
     ElectionsSchema,
     ElectionUpdateSchema,
     ElectionFullDetailsSchema,
@@ -421,3 +422,31 @@ def election_get_all_candidates_by_election_id(election_id):
     )
 
     return {"candidates": candidates}, 200
+
+
+@election.post("/<election_id>/change/")
+@election.input(ElectionStartEndSchema)
+@election.output(GenericMessage)
+@election.doc(
+    summary="Election Start / End",
+    description="An endpoint to start or end an election\n\nRoles: ADMIN",
+    responses=[200, 403, 404],
+)
+@jwt_required()
+def election_change_state(election_id, data):
+    user_has_required_roles = has_roles(["admin"], get_jwt_identity())
+    if not user_has_required_roles:
+        raise UserDoesNotHaveRequiredRoles
+
+    election: Election = Election.find_by_id(id=election_id)
+    if not election:
+        raise ElectionDoesNotExist
+
+    election.state = data["state"]
+
+    election, error = modify(election)
+
+    if not error:
+        return {
+            "message": f"Election {election.name} has been changed to {election.state}"
+        }, 200

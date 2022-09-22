@@ -9,6 +9,7 @@ class Election(db.Model):
         db.String(length=32), nullable=False, unique=True, primary_key=True
     )
     name = db.Column(db.String(length=120), nullable=False, unique=True)
+    state = db.Column(db.String(length=10), nullable=False, default="on-hold")
     route_name = db.Column(db.String(length=50), nullable=False, unique=True)
     type = db.Column(db.String(length=10), nullable=False)
     college = db.Column(db.String(length=100), nullable=True)

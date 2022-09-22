@@ -25,5 +25,9 @@ class Organization(db.Model):
         return cls.query.filter_by(id=id).first()
 
     @classmethod
+    def find_by_administrator_id(cls, admin_id):
+        return cls.query.filter_by(administrator_id=admin_id).first()
+
+    @classmethod
     def find_all(cls):
         return cls.query.all()
