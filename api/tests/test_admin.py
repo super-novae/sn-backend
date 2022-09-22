@@ -1,4 +1,3 @@
-from urllib import response
 from .setup import truncate_db_tables
 from ..administrator.models import Administrator
 from ..test_data.admin_data import (
