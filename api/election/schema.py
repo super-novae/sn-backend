@@ -1,5 +1,5 @@
 from apiflask import Schema
-from apiflask.fields import String, List, Nested
+from apiflask.fields import String, List, Nested, Boolean
 from apiflask.validators import Length, Regexp, URL, OneOf
 from api.generic.data import types, colleges, programmes
 
@@ -14,6 +14,7 @@ class ElectionSchema(Schema):
     type = String(required=True, validate=[OneOf(types)])
     college = String(required=False, validate=[OneOf(colleges)])
     programme = String(required=False, validate=[OneOf(programmes)])
+    state = Boolean(required=True)
 
 
 class ElectionsSchema(Schema):
