@@ -14,7 +14,7 @@ class ElectionSchema(Schema):
     type = String(required=True, validate=[OneOf(types)])
     college = String(required=False, validate=[OneOf(colleges)])
     programme = String(required=False, validate=[OneOf(programmes)])
-    state = Boolean(required=True)
+    state = Boolean(required=True, dump_only=True)
 
 
 class ElectionsSchema(Schema):
