@@ -1196,6 +1196,83 @@ def test_election_get_all_candidates_by_election_id_unauthorized(client, seed):
     truncate_db_tables()
 
 
+def test_election_get_all_candidate_by_office_id_success(client, seed):
+    # Clear database before tests
+    truncate_db_tables()
+
+    # Initialize the data and model instances
+    superuser_create()
+    administrator_signup(client, seed)
+    organization_create()
+    election = election_create()
+    office = office_create()
+    candidate_create()
+
+    administrator = administrator_login(client, seed)
+
+    response = client.get(
+        f"api/v1/elections/{election.id}/office/{office.id}/candidates",
+        headers={"Authorization": f"Bearer {administrator['auth_token']}"},
+    )
+
+    assert response.status_code == 200
+    assert response.json["candidates"]
+
+
+def test_election_get_all_candidate_by_office_id_unauthorized(client, seed):
+    # Clear database before tests
+    truncate_db_tables()
+
+    # Initialize the data and model instances
+    superuser_create()
+    administrator_signup(client, seed)
+    organization_create()
+    election = election_create()
+    office = office_create()
+    candidate_create()
+
+    superuser = superuser_login(client)
+
+    response = client.get(
+        f"api/v1/elections/{election.id}/office/{office.id}/candidates",
+        headers={"Authorization": f"Bearer {superuser['auth_token']}"},
+    )
+
+    assert response.status_code == 403
+    assert (
+        response.json["message"]
+        == "User does not have the required permissions to perform action"
+    )
+
+
+def test_election_get_all_candidate_by_office_id_office_not_found(
+    client, seed
+):
+    # Clear database before tests
+    truncate_db_tables()
+
+    # Initialize the data and model instances
+    superuser_create()
+    administrator_signup(client, seed)
+    organization_create()
+    election = election_create()
+    office = office_create()
+    candidate_create()
+
+    administrator = administrator_login(client, seed)
+
+    response = client.get(
+        f"api/v1/elections/{election.id}/office/{office.id[:5] + office.id[5:][::-1]}/candidates",
+        headers={"Authorization": f"Bearer {administrator['auth_token']}"},
+    )
+
+    assert response.status_code == 404
+    assert (
+        response.json["message"]
+        == "An office with the given ID does not exist"
+    )
+
+
 def test_election_change_state_success(client, seed):
     # Clear database before tests
     truncate_db_tables()

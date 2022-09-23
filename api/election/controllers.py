@@ -424,6 +424,29 @@ def election_get_all_candidates_by_election_id(election_id):
     return {"candidates": candidates}, 200
 
 
+@election.get("/<election_id>/office/<office_id>/candidates")
+@election.output(CandidatesSchema)
+@election.doc(
+    summary="Election Get Candidates by Office Id",
+    description="An endpoint to get all candidates by office id\n\nRoles: ADMIN",
+    responses=[200, 403, 404],
+)
+@jwt_required()
+def election_get_all_candidate_by_office_id(election_id, office_id):
+    user_has_required_roles = has_roles(["admin"], get_jwt_identity())
+    if not user_has_required_roles:
+        raise UserDoesNotHaveRequiredRoles
+
+    office = Office.find_by_id(office_id)
+
+    if office:
+        candidates = Candidate.find_all_candidates_by_office_id(
+            office_id=office_id
+        )
+        return {"candidates": candidates}, 200
+    raise OfficeDoesNotExist
+
+
 @election.post("/<election_id>/change/")
 @election.input(ElectionStartEndSchema)
 @election.output(GenericMessage)
