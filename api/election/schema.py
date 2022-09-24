@@ -46,7 +46,7 @@ class OfficeUpdateSchema(Schema):
 
 class CandidateSchema(Schema):
     name = String(validate=[Length(5, 80)], required=True)
-    public_id = String(validate=[Length(equal=16)], dump_only=True)
+    id = String(validate=[Length(equal=32)], dump_only=True)
     organization_id = String(validate=[Length(equal=32)])
     election_id = String(validate=[Length(equal=32)])
     profile_image_url = String(validate=[URL(schemes=["https"])])
