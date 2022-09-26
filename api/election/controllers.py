@@ -423,6 +423,10 @@ def election_get_all_candidates_by_election_id(election_id):
     candidates = Candidate.find_all_candidates_by_election_id(
         election_id=election_id
     )
+    candidate: Candidate
+    for candidate in candidates:
+        office = Office.find_by_id(candidate.office_id)
+        candidate.office_name = office.name
 
     return {"candidates": candidates}, 200
 
