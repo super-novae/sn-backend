@@ -1,11 +1,9 @@
 from api.administrator.models import Administrator
 from api.extensions import db, fake
 from ..organization.models import Organization
-from ..test_data.admin_data import administrator_get_test_instance
 
 
 def organization_details():
-    admin = administrator_get_test_instance()
     return {"name": fake.company()}
 
 

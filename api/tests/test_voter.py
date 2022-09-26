@@ -456,14 +456,14 @@ def test_voter_get_elections_successful(client, seed):
     # Initialize the data and model instances
     superuser_create()
     administrator_signup(client, seed)
-    organization_create()
+    organization = organization_create()
     election_create()
     voter_create(seed)
 
     voter = voter_login(client, seed)
 
     response = client.get(
-        f"/api/v1/voters/{voter['id']}/elections",
+        f"/api/v1/voters/{voter['id']}/organization/{organization.id}/elections",
         headers={"Authorization": f"Bearer {voter['auth_token']}"},
     )
 
@@ -486,7 +486,7 @@ def test_voter_get_elections_unauthorized(client, seed):
     # Initialize the data and model instances
     superuser_create()
     administrator_signup(client, seed)
-    organization_create()
+    organization = organization_create()
     election_create()
     voter_create(seed)
 
@@ -494,7 +494,7 @@ def test_voter_get_elections_unauthorized(client, seed):
     administrator = administrator_login(client, seed)
 
     response = client.get(
-        f"/api/v1/voters/{voter['id']}/elections",
+        f"/api/v1/voters/{voter['id']}/organization/{organization.id}/elections",
         headers={"Authorization": f"Bearer {administrator['auth_token']}"},
     )
 

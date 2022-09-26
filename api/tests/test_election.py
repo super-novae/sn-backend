@@ -1194,3 +1194,171 @@ def test_election_get_all_candidates_by_election_id_unauthorized(client, seed):
 
     # Clear database after tests
     truncate_db_tables()
+
+
+def test_election_get_all_candidate_by_office_id_success(client, seed):
+    # Clear database before tests
+    truncate_db_tables()
+
+    # Initialize the data and model instances
+    superuser_create()
+    administrator_signup(client, seed)
+    organization_create()
+    election = election_create()
+    office = office_create()
+    candidate_create()
+
+    administrator = administrator_login(client, seed)
+
+    response = client.get(
+        f"api/v1/elections/{election.id}/office/{office.id}/candidates",
+        headers={"Authorization": f"Bearer {administrator['auth_token']}"},
+    )
+
+    assert response.status_code == 200
+    assert response.json["candidates"]
+
+
+def test_election_get_all_candidate_by_office_id_unauthorized(client, seed):
+    # Clear database before tests
+    truncate_db_tables()
+
+    # Initialize the data and model instances
+    superuser_create()
+    administrator_signup(client, seed)
+    organization_create()
+    election = election_create()
+    office = office_create()
+    candidate_create()
+
+    superuser = superuser_login(client)
+
+    response = client.get(
+        f"api/v1/elections/{election.id}/office/{office.id}/candidates",
+        headers={"Authorization": f"Bearer {superuser['auth_token']}"},
+    )
+
+    assert response.status_code == 403
+    assert (
+        response.json["message"]
+        == "User does not have the required permissions to perform action"
+    )
+
+
+def test_election_get_all_candidate_by_office_id_office_not_found(
+    client, seed
+):
+    # Clear database before tests
+    truncate_db_tables()
+
+    # Initialize the data and model instances
+    superuser_create()
+    administrator_signup(client, seed)
+    organization_create()
+    election = election_create()
+    office = office_create()
+    candidate_create()
+
+    administrator = administrator_login(client, seed)
+
+    response = client.get(
+        f"api/v1/elections/{election.id}/office/{office.id[:5] + office.id[5:][::-1]}/candidates",
+        headers={"Authorization": f"Bearer {administrator['auth_token']}"},
+    )
+
+    assert response.status_code == 404
+    assert (
+        response.json["message"]
+        == "An office with the given ID does not exist"
+    )
+
+
+def test_election_change_state_success(client, seed):
+    # Clear database before tests
+    truncate_db_tables()
+
+    # Initialize the data and model instances
+    superuser_create()
+    administrator_signup(client, seed)
+    organization_create()
+    election = election_create()
+    office_create()
+    candidate_create()
+
+    administrator = administrator_login(client, seed)
+
+    response = client.post(
+        f"/api/v1/elections/{election.id}/change/",
+        headers={"Authorization": f"Bearer {administrator['auth_token']}"},
+        json={"state": "in-session"},
+    )
+
+    assert response.status_code == 200
+    assert (
+        response.json["message"]
+        == f"Election {election.name} has been changed to {election.state}"
+    )
+    assert election.state == "in-session"
+
+    # Clear database after tests
+    truncate_db_tables()
+
+
+def test_election_change_state_unauthorized(client, seed):
+    # Clear database before tests
+    truncate_db_tables()
+
+    # Initialize the data and model instances
+    superuser_create()
+    administrator_signup(client, seed)
+    organization_create()
+    election = election_create()
+    office_create()
+    candidate_create()
+
+    superuser = superuser_login(client)
+
+    response = client.post(
+        f"/api/v1/elections/{election.id}/change/",
+        headers={"Authorization": f"Bearer {superuser['auth_token']}"},
+        json={"state": "in-session"},
+    )
+
+    assert response.status_code == 403
+    assert (
+        response.json["message"]
+        == "User does not have the required permissions to perform action"
+    )
+
+    # Clear database after tests
+    truncate_db_tables()
+
+
+def test_election_change_state_election_not_found(client, seed):
+    # Clear database before tests
+    truncate_db_tables()
+
+    # Initialize the data and model instances
+    superuser_create()
+    administrator_signup(client, seed)
+    organization_create()
+    election = election_create()
+    office_create()
+    candidate_create()
+
+    administrator = administrator_login(client, seed)
+
+    response = client.post(
+        f"/api/v1/elections/{election.id[:5] + election.id[5:][::-1]}/change/",
+        headers={"Authorization": f"Bearer {administrator['auth_token']}"},
+        json={"state": "in-session"},
+    )
+
+    assert response.status_code == 404
+    assert (
+        response.json["message"]
+        == "An election with the given ID does not exist"
+    )
+
+    # Clear database after tests
+    truncate_db_tables()

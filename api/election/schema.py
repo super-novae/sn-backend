@@ -1,5 +1,5 @@
 from apiflask import Schema
-from apiflask.fields import String, List, Nested
+from apiflask.fields import String, List, Nested, Boolean
 from apiflask.validators import Length, Regexp, URL, OneOf
 from api.generic.data import types, colleges, programmes
 
@@ -14,6 +14,7 @@ class ElectionSchema(Schema):
     type = String(required=True, validate=[OneOf(types)])
     college = String(required=False, validate=[OneOf(colleges)])
     programme = String(required=False, validate=[OneOf(programmes)])
+    state = Boolean(required=True, dump_only=True)
 
 
 class ElectionsSchema(Schema):
@@ -45,11 +46,12 @@ class OfficeUpdateSchema(Schema):
 
 class CandidateSchema(Schema):
     name = String(validate=[Length(5, 80)], required=True)
-    public_id = String(validate=[Length(equal=16)], dump_only=True)
+    id = String(validate=[Length(equal=32)], dump_only=True)
     organization_id = String(validate=[Length(equal=32)])
     election_id = String(validate=[Length(equal=32)])
     profile_image_url = String(validate=[URL(schemes=["https"])])
     office_id = String(required=True, validate=[Regexp("^off-")])
+    office_name = String(required=False)
     programme = String(required=True, validate=[Length(min=10, max=100)])
 
 
@@ -67,3 +69,7 @@ class OfficeCandidates(Schema):
 class ElectionFullDetailsSchema(Schema):
     election = Nested(ElectionSchema)
     offices = List(Nested(OfficeCandidates))
+
+
+class ElectionStartEndSchema(Schema):
+    state = String(required=True, validate=[OneOf(["in-session", "on-hold"])])

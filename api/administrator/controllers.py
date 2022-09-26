@@ -25,6 +25,9 @@ from .schema import (
 )
 from api.generic.methods import has_roles
 from api.generic.errors import UserDoesNotHaveRequiredRoles
+from api.organization.models import Organization
+from api.organization.schema import OrganizationSchema
+from api.organization.errors import OrganizationNotFound
 
 # Initiate module blueprint
 administrator = APIBlueprint(
@@ -190,3 +193,25 @@ def administrator_get_by_id(admin_id):
         return admin
 
     raise AdministratorWithCredentialsDoesNotExist
+
+
+@administrator.get("/<admin_id>/org")
+@administrator.output(OrganizationSchema)
+@administrator.doc(
+    summary="Administrator Get Organization Id",
+    description="An endpoint to the organization of an administrator",
+)
+@jwt_required()
+def administrator_get_organization(admin_id):
+    # Perform security checks
+    user_has_required_roles = has_roles(["super", "admin"], get_jwt_identity())
+    if not user_has_required_roles:
+        raise UserDoesNotHaveRequiredRoles
+
+    admin: Administrator = Administrator.find_by_id(admin_id)
+    if admin:
+        organization = Organization.find_by_administrator_id(admin_id)
+        if organization:
+            return organization, 200
+        raise OrganizationNotFound
+    raise AdministratorWithIdDoesNotExist

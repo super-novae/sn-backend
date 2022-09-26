@@ -9,7 +9,8 @@ class Election(db.Model):
         db.String(length=32), nullable=False, unique=True, primary_key=True
     )
     name = db.Column(db.String(length=120), nullable=False, unique=True)
-    route_name = db.Column(db.String(length=50), nullable=False, unique=True)
+    state = db.Column(db.String(length=10), nullable=False, default="on-hold")
+    route_name = db.Column(db.String(length=50), nullable=True)
     type = db.Column(db.String(length=10), nullable=False)
     college = db.Column(db.String(length=100), nullable=True)
     programme = db.Column(db.String(length=100), nullable=True)
@@ -39,17 +40,23 @@ class Election(db.Model):
         return cls.query.filter_by(id=id).first()
 
     @classmethod
-    def find_by_type(cls, type):
-        return cls.query.filter_by(type=type).all()
-
-    @classmethod
-    def find_by_college(cls, college):
-        return cls.query.filter_by(college=college, type="College").all()
-
-    @classmethod
-    def find_by_programme(cls, programme):
+    def find_by_type(cls, type, organization_id):
         return cls.query.filter_by(
-            programme=programme, type="Department"
+            type=type, organization_id=organization_id
+        ).all()
+
+    @classmethod
+    def find_by_college(cls, college, organization_id):
+        return cls.query.filter_by(
+            college=college, type="College", organization_id=organization_id
+        ).all()
+
+    @classmethod
+    def find_by_programme(cls, programme, organiztion_id):
+        return cls.query.filter_by(
+            programme=programme,
+            type="Department",
+            organization_id=organiztion_id,
         ).all()
 
     @classmethod

@@ -88,6 +88,12 @@ class Voter(db.Model):
         return cls.query.filter_by(id=id).first()
 
     @classmethod
+    def find_by_id_and_organization_id(cls, id, organization_id):
+        return cls.query.filter_by(
+            id=id, organization_id=organization_id
+        ).first()
+
+    @classmethod
     def find_by_username(cls, username):
         return cls.query.filter_by(username=username).first()
 

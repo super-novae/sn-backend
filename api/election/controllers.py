@@ -8,6 +8,7 @@ from .schema import (
     CandidateSchema,
     CandidatesSchema,
     ElectionSchema,
+    ElectionStartEndSchema,
     ElectionsSchema,
     ElectionUpdateSchema,
     ElectionFullDetailsSchema,
@@ -393,12 +394,15 @@ def election_get_candidate_by_id(election_id, candidate_id):
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
 
-    candidate = Candidate.find_candidate_by_id(
+    candidate: Candidate = Candidate.find_candidate_by_id(
         id=candidate_id, election_id=election_id
     )
 
     if not candidate:
         raise CandidateDoesNotExist
+
+    office: Office = Office.find_by_id(candidate.office_id)
+    candidate.office_name = office.name
 
     return candidate, 200
 
@@ -419,5 +423,60 @@ def election_get_all_candidates_by_election_id(election_id):
     candidates = Candidate.find_all_candidates_by_election_id(
         election_id=election_id
     )
+    candidate: Candidate
+    for candidate in candidates:
+        office = Office.find_by_id(candidate.office_id)
+        candidate.office_name = office.name
 
     return {"candidates": candidates}, 200
+
+
+@election.get("/<election_id>/office/<office_id>/candidates")
+@election.output(CandidatesSchema)
+@election.doc(
+    summary="Election Get Candidates by Office Id",
+    description="An endpoint to get all candidates by office id\n\nRoles: ADMIN",
+    responses=[200, 403, 404],
+)
+@jwt_required()
+def election_get_all_candidate_by_office_id(election_id, office_id):
+    user_has_required_roles = has_roles(["admin"], get_jwt_identity())
+    if not user_has_required_roles:
+        raise UserDoesNotHaveRequiredRoles
+
+    office = Office.find_by_id(office_id)
+
+    if office:
+        candidates = Candidate.find_all_candidates_by_office_id(
+            office_id=office_id
+        )
+        return {"candidates": candidates}, 200
+    raise OfficeDoesNotExist
+
+
+@election.post("/<election_id>/change/")
+@election.input(ElectionStartEndSchema)
+@election.output(GenericMessage)
+@election.doc(
+    summary="Election Start / End",
+    description="An endpoint to start or end an election\n\nRoles: ADMIN",
+    responses=[200, 403, 404],
+)
+@jwt_required()
+def election_change_state(election_id, data):
+    user_has_required_roles = has_roles(["admin"], get_jwt_identity())
+    if not user_has_required_roles:
+        raise UserDoesNotHaveRequiredRoles
+
+    election: Election = Election.find_by_id(id=election_id)
+    if not election:
+        raise ElectionDoesNotExist
+
+    election.state = data["state"]
+
+    election, error = modify(election)
+
+    if not error:
+        return {
+            "message": f"Election {election.name} has been changed to {election.state}"
+        }, 200
