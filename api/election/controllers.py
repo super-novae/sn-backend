@@ -394,12 +394,15 @@ def election_get_candidate_by_id(election_id, candidate_id):
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
 
-    candidate = Candidate.find_candidate_by_id(
+    candidate: Candidate = Candidate.find_candidate_by_id(
         id=candidate_id, election_id=election_id
     )
 
     if not candidate:
         raise CandidateDoesNotExist
+
+    office: Office = Office.find_by_id(candidate.office_id)
+    candidate.office_name = office.name
 
     return candidate, 200
 

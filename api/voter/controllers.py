@@ -189,7 +189,7 @@ def voter_get_all(query):
         raise OrganizationNotFound
 
 
-@voters.get("/<voter_id>/elections")
+@voters.get("/<voter_id>/organization/<organization_id>/elections")
 @voters.output(VoterElections)
 @voters.doc(
     summary="Voter Elections",
@@ -197,16 +197,24 @@ def voter_get_all(query):
     responses=[200, 403],
 )
 @jwt_required()
-def voter_get_elections(voter_id):
+def voter_get_elections(voter_id, organization_id):
     # Perform security checks
     user_has_required_roles = has_roles(["voter"], get_jwt_identity())
     if not user_has_required_roles:
         raise UserDoesNotHaveRequiredRoles
 
-    voter: Voter = Voter.find_by_id(voter_id)
-    src_elections = Election.find_by_type("SRC")
-    college_elections = Election.find_by_college(voter.college)
-    department_elections = Election.find_by_programme(voter.programme)
+    voter: Voter = Voter.find_by_id_and_organization_id(
+        id=voter_id, organization_id=organization_id
+    )
+    src_elections = Election.find_by_type(
+        type="SRC", organization_id=organization_id
+    )
+    college_elections = Election.find_by_college(
+        college=voter.college, organization_id=organization_id
+    )
+    department_elections = Election.find_by_programme(
+        programme=voter.programme, organiztion_id=organization_id
+    )
 
     return {
         "src_elections": src_elections,

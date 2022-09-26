@@ -51,6 +51,7 @@ class CandidateSchema(Schema):
     election_id = String(validate=[Length(equal=32)])
     profile_image_url = String(validate=[URL(schemes=["https"])])
     office_id = String(required=True, validate=[Regexp("^off-")])
+    office_name = String(required=False)
     programme = String(required=True, validate=[Length(min=10, max=100)])
 
 
