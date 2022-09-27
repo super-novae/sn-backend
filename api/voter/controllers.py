@@ -134,7 +134,9 @@ def voter_login(data):
     if voter:
         voter_password_is_correct = voter.verify_password(data["password"])
         if voter_password_is_correct:
-            voter.auth_token = create_access_token(voter.id,expires_delta=timedelta(hours=2))
+            voter.auth_token = create_access_token(
+                voter.id, expires_delta=timedelta(hours=2)
+            )
             return voter, 200
     raise VoterWrongCredentials
 

@@ -38,7 +38,9 @@ def superuser_login(data):
             password=data["password"]
         )
         if superuser_password_is_correct:
-            superuser.auth_token = create_access_token(superuser.id, expires_delta=timedelta(hours=2))
+            superuser.auth_token = create_access_token(
+                superuser.id, expires_delta=timedelta(hours=2)
+            )
             return superuser
     logger.warning("Wrong superuser login credentials provided")
     raise SuperuserWithCredentialsDoesNotExist

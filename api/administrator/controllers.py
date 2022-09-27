@@ -153,7 +153,9 @@ def administrator_login(data):
     if admin:
         admin_password_is_correct = admin.verify_password(data["password"])
         if admin_password_is_correct:
-            admin.auth_token = create_access_token(admin.id, expires_delta=timedelta(hours=2))
+            admin.auth_token = create_access_token(
+                admin.id, expires_delta=timedelta(hours=2)
+            )
             return admin
     raise AdministratorWithCredentialsDoesNotExist
 
