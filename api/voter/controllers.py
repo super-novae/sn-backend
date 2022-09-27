@@ -33,6 +33,7 @@ from flask_jwt_extended import (
     jwt_required,
 )
 from sys import exc_info
+from datetime import timedelta
 
 voters = APIBlueprint(
     "voter", __name__, tag="Voter", url_prefix="/api/v1/voters"
@@ -133,7 +134,7 @@ def voter_login(data):
     if voter:
         voter_password_is_correct = voter.verify_password(data["password"])
         if voter_password_is_correct:
-            voter.auth_token = create_access_token(voter.id)
+            voter.auth_token = create_access_token(voter.id,expires_delta=timedelta(hours=2))
             return voter, 200
     raise VoterWrongCredentials
 

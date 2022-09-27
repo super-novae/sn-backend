@@ -28,6 +28,7 @@ from api.generic.errors import UserDoesNotHaveRequiredRoles
 from api.organization.models import Organization
 from api.organization.schema import OrganizationSchema
 from api.organization.errors import OrganizationNotFound
+from datetime import timedelta
 
 # Initiate module blueprint
 administrator = APIBlueprint(
@@ -152,7 +153,7 @@ def administrator_login(data):
     if admin:
         admin_password_is_correct = admin.verify_password(data["password"])
         if admin_password_is_correct:
-            admin.auth_token = create_access_token(admin.id)
+            admin.auth_token = create_access_token(admin.id, expires_delta=timedelta(hours=2))
             return admin
     raise AdministratorWithCredentialsDoesNotExist
 

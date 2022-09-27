@@ -4,6 +4,7 @@ from .errors import SuperuserWithCredentialsDoesNotExist
 from .models import Superuser
 from .schema import SuperuserLoginSchema, SuperUserSchema
 from api.extensions import logger
+from datetime import timedelta
 
 # Initiate Super User module blueprint
 superuser = APIBlueprint(
@@ -37,7 +38,7 @@ def superuser_login(data):
             password=data["password"]
         )
         if superuser_password_is_correct:
-            superuser.auth_token = create_access_token(superuser.id)
+            superuser.auth_token = create_access_token(superuser.id, expires_delta=timedelta(hours=2))
             return superuser
     logger.warning("Wrong superuser login credentials provided")
     raise SuperuserWithCredentialsDoesNotExist
