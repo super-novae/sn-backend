@@ -3,9 +3,16 @@ Backend repo for voting system
 
 [![linting: pylint](https://img.shields.io/badge/linting-pylint-yellowgreen)](https://github.com/PyCQA/pylint)
 
+## Test Coverage Report
+1. Clone the repo
+2. Open test coverage folder `./test_coverage/`
+3. Open the file `index.html` to view the test coverage report
+
+## Dockerhub Image
+1. Visit dockerhub the latest docker image (https://hub.docker.com/repository/docker/rising2392/sn-backend-api)
 
 ## Backend Models
-https://dbdiagram.io/d/629c499b54ce2635275fd31d
+1. View the models used in backend (https://dbdiagram.io/d/629c499b54ce2635275fd31d)
 
 ## Project set-up
 1. Clone the project
@@ -49,6 +56,10 @@ https://dbdiagram.io/d/629c499b54ce2635275fd31d
     REDOC_STANDALONE_JS=https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js
     DEV_DATABASE_URL=postgresql://postgres:password@localhost:5432/supernovae_dev_db
     TEST_DATABASE_URL=postgresql://postgres:password@localhost:5432/supernovae_test_db
+    MAIL_SERVER=smtp.gmail.com
+    MAIL_PORT=465
+    MAIL_USERNAME=username@email.com
+    MAIL_PASSWORD=superuserpassword
     ```
 
 8. Perform initial migrations

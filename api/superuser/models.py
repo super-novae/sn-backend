@@ -31,7 +31,7 @@ class Superuser(db.Model):
     def password():
         return "Password can only be set"
 
-    @property().setter
+    @password.setter
     def password(self, password):
         self.password_hash = bcrypt.generate_password_hash(
             password, environ.get("BCRYPT_LOG_ROUNDS")
